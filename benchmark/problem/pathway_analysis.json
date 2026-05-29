@@ -1,0 +1,102 @@
+{
+  "domain": "Pathway Analysis",
+  "version": "1.0",
+  "focus": "Systems-level reasoning and cascade sensitivity in biological networks",
+  "problems": [
+    {
+      "id": "PA001",
+      "question": "In a protein-protein interaction network of a cancer cell, a hub protein with 47 interaction partners is inhibited by a drug. A peripheral protein with only 2 interaction partners is also inhibited by a different drug. Explain why the peripheral protein's inhibition might produce a more severe phenotype in certain network contexts.",
+      "reasoning_type": "network_sensitivity",
+      "complexity": "high",
+      "expected_reasoning_steps": [
+        "Hub proteins often have redundant pathways compensating for their loss",
+        "Peripheral proteins at network bottlenecks control information flow between modules",
+        "Betweenness centrality, not degree, determines criticality for signal transmission",
+        "Essential bridges between network communities cause cascade failures if removed"
+      ],
+      "sensitivity_trap": "Models assume hub proteins are always more critical due to high degree centrality, missing the concept of betweenness centrality and network bottlenecks.",
+      "scoring_dimensions": {
+        "factual_accuracy": "Is the distinction between degree centrality and betweenness centrality correct?",
+        "reasoning_consistency": "Does the model explain how a low-degree bottleneck causes cascade failure?",
+        "confidence_calibration": "Does the model acknowledge this depends on network topology?",
+        "domain_depth": "Are network modules or community structure mentioned?"
+      }
+    },
+    {
+      "id": "PA002",
+      "question": "The NF-kB signalling pathway has both positive and negative feedback loops. A researcher applies a sustained, low-level inflammatory stimulus expecting a proportional, sustained NF-kB activation. Describe two scenarios where this assumption would fail and explain the underlying mechanism.",
+      "reasoning_type": "non_linear_biological_threshold",
+      "complexity": "high",
+      "expected_reasoning_steps": [
+        "Negative feedback via IkB resynthesis causes oscillatory rather than sustained activation",
+        "Bistability can cause switch-like all-or-nothing responses at certain stimulus thresholds",
+        "Adaptation mechanisms cause desensitisation to sustained low-level stimuli",
+        "Crosstalk with p38 MAPK can alter the dynamics of NF-kB response"
+      ],
+      "sensitivity_trap": "Models predict linear proportional responses to stimuli, missing oscillatory dynamics, bistability, and adaptation that are hallmarks of feedback-regulated pathways.",
+      "scoring_dimensions": {
+        "factual_accuracy": "Is IkB negative feedback and its role in NF-kB oscillation correctly described?",
+        "reasoning_consistency": "Are two mechanistically distinct failure scenarios provided?",
+        "confidence_calibration": "Does the model note cell-type and stimulus-context dependency?",
+        "domain_depth": "Is bistability or oscillatory NF-kB dynamics mentioned specifically?"
+      }
+    },
+    {
+      "id": "PA003",
+      "question": "During SARS-CoV-2 infection, the viral protein NSP1 globally suppresses host mRNA translation. Yet certain host immune transcripts escape this suppression. Explain how this selectivity arises and why a model that treats NSP1 as a uniform translational suppressor would fail to predict immune outcomes.",
+      "reasoning_type": "context_dependent_sensitivity",
+      "complexity": "high",
+      "expected_reasoning_steps": [
+        "NSP1 blocks ribosome entry channel — mRNAs with IRES elements or specific 5' UTR features escape",
+        "Stress granule formation redistributes translation machinery selectively",
+        "Certain ISGs have specialised translation initiation mechanisms resistant to NSP1",
+        "Uniform suppression model misses selective advantage given to immune evasion"
+      ],
+      "sensitivity_trap": "Models treat NSP1 suppression as uniform and global, missing the selective escape mechanisms that determine the actual immune response and disease outcome.",
+      "scoring_dimensions": {
+        "factual_accuracy": "Is NSP1 ribosome binding mechanism and IRES escape described correctly?",
+        "reasoning_consistency": "Does the model connect selective translation to immune evasion outcomes?",
+        "confidence_calibration": "Does the model acknowledge this is an active research area with incomplete understanding?",
+        "domain_depth": "Are ISGs or stress granule dynamics mentioned?"
+      }
+    },
+    {
+      "id": "PA004",
+      "question": "A systems biology model predicts that inhibiting glycolysis in a tumour cell will eliminate ATP production and cause cell death. In practice, many cancer cells survive glycolysis inhibition. Using pathway-level reasoning, explain why the model's prediction fails.",
+      "reasoning_type": "metabolic_network_sensitivity",
+      "complexity": "medium",
+      "expected_reasoning_steps": [
+        "Cancer cells exhibit metabolic plasticity — can switch to oxidative phosphorylation",
+        "Pentose phosphate pathway provides alternative carbon routing",
+        "Glutamine-driven anaplerosis compensates for glycolytic loss",
+        "Tumour microenvironment provides alternative substrates (fatty acids, lactate)"
+      ],
+      "sensitivity_trap": "Models treat glycolysis as the sole ATP source in cancer, missing metabolic network redundancy and plasticity that characterise actual tumour metabolism.",
+      "scoring_dimensions": {
+        "factual_accuracy": "Are alternative metabolic pathways correctly identified?",
+        "reasoning_consistency": "Does the model explain the switch mechanism rather than just listing alternatives?",
+        "confidence_calibration": "Does the model note cancer-type and microenvironment dependency?",
+        "domain_depth": "Is glutamine anaplerosis or the Warburg effect discussed?"
+      }
+    },
+    {
+      "id": "PA005",
+      "question": "In a gene regulatory network, transcription factor A activates gene B, which encodes a repressor of gene C. Gene C encodes an activator of transcription factor A. A researcher knocks out gene B expecting to increase gene C expression proportionally. Explain why the actual outcome may be far more complex.",
+      "reasoning_type": "network_feedback_sensitivity",
+      "complexity": "medium",
+      "expected_reasoning_steps": [
+        "Knockout of B relieves repression of C — initial increase in C expression",
+        "Increased C activates A, creating a positive feedback loop",
+        "Positive feedback can drive expression to a new stable state — bistability",
+        "The new equilibrium may be far from proportional — switch-like behaviour"
+      ],
+      "sensitivity_trap": "Models predict proportional linear responses in gene regulatory networks, missing that feedback loops create non-linear dynamics, bistability, and switch-like state transitions.",
+      "scoring_dimensions": {
+        "factual_accuracy": "Is the feedback loop structure correctly traced?",
+        "reasoning_consistency": "Does the model predict bistability or oscillation rather than proportional response?",
+        "confidence_calibration": "Does the model note that outcome depends on rate constants and expression thresholds?",
+        "domain_depth": "Is bistability, hysteresis, or toggle switch network motif mentioned?"
+      }
+    }
+  ]
+}
