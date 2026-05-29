@@ -1,0 +1,102 @@
+{
+  "domain": "Molecular Biology",
+  "version": "1.0",
+  "focus": "Context-dependent sensitivity and niche domain depth",
+  "problems": [
+    {
+      "id": "MB001",
+      "question": "A single point mutation in the BRCA1 RING domain disrupts its interaction with BARD1. Explain why this seemingly localised change can lead to genome-wide instability rather than a localised loss of function.",
+      "reasoning_type": "context_dependent_sensitivity",
+      "complexity": "high",
+      "expected_reasoning_steps": [
+        "BRCA1-BARD1 heterodimer is required for E3 ubiquitin ligase activity",
+        "Loss of this activity impairs DNA damage response signalling",
+        "Downstream cascade affects homologous recombination repair globally",
+        "Accumulated unrepaired DSBs across entire genome lead to chromosomal instability"
+      ],
+      "sensitivity_trap": "Models often treat this as a localised protein interaction loss rather than recognising the cascade effect across DNA repair pathways genome-wide.",
+      "scoring_dimensions": {
+        "factual_accuracy": "Is the BRCA1-BARD1 interaction and its role described correctly?",
+        "reasoning_consistency": "Does the model trace the cascade from local mutation to global instability?",
+        "confidence_calibration": "Does the model acknowledge uncertainty in predicting phenotypic severity?",
+        "domain_depth": "Does the model reference homologous recombination and DSB repair specifically?"
+      }
+    },
+    {
+      "id": "MB002",
+      "question": "The TP53 gene is often called the 'guardian of the genome.' A heterozygous loss-of-function mutation in TP53 is observed in a patient. Why might this single allele loss have disproportionately severe consequences compared to what haploinsufficiency alone would predict?",
+      "reasoning_type": "context_dependent_sensitivity",
+      "complexity": "high",
+      "expected_reasoning_steps": [
+        "p53 functions as a tetramer — dominant negative effect of mutant allele",
+        "Mutant p53 can sequester wild-type p53 protein",
+        "Loss of p53-mediated apoptosis and cell cycle arrest",
+        "Gain-of-function mutations in TP53 can actively promote oncogenesis"
+      ],
+      "sensitivity_trap": "Models frequently underestimate severity by treating heterozygous loss as simply 50% reduced function, missing dominant negative and gain-of-function mechanisms.",
+      "scoring_dimensions": {
+        "factual_accuracy": "Is the tetrameric nature of p53 and dominant negative effect described?",
+        "reasoning_consistency": "Does the model go beyond simple haploinsufficiency logic?",
+        "confidence_calibration": "Does the model note that outcome depends on specific mutation type?",
+        "domain_depth": "Does the model distinguish loss-of-function from gain-of-function TP53 mutations?"
+      }
+    },
+    {
+      "id": "MB003",
+      "question": "A researcher inhibits a single kinase in the MAPK/ERK signalling pathway at the level of MEK1. They expect a proportional reduction in downstream ERK activity. Under what biological conditions would this assumption fail, and why?",
+      "reasoning_type": "non_linear_biological_threshold",
+      "complexity": "high",
+      "expected_reasoning_steps": [
+        "MAPK pathway has signal amplification — small upstream changes are amplified",
+        "Feedback loops (negative via MKP phosphatases) complicate linear predictions",
+        "Crosstalk with PI3K/AKT pathway can compensate for MEK inhibition",
+        "Bistability in ERK activation means threshold effects, not proportional response"
+      ],
+      "sensitivity_trap": "Models assume linear dose-response; they miss bistability, feedback loops, and pathway crosstalk that make biological signalling inherently non-linear.",
+      "scoring_dimensions": {
+        "factual_accuracy": "Are feedback mechanisms and pathway crosstalk correctly described?",
+        "reasoning_consistency": "Does the model explain non-linearity mechanistically?",
+        "confidence_calibration": "Does the model note cell-type and context dependency?",
+        "domain_depth": "Is bistability or ultrasensitivity in MAPK signalling mentioned?"
+      }
+    },
+    {
+      "id": "MB004",
+      "question": "In a CRISPR screen, a gene shows no fitness effect when knocked out in standard culture conditions but becomes essential under hypoxic stress. What does this tell us about how models of gene essentiality should be interpreted?",
+      "reasoning_type": "context_dependent_sensitivity",
+      "complexity": "medium",
+      "expected_reasoning_steps": [
+        "Gene essentiality is context-dependent, not absolute",
+        "Conditional essentiality revealed only under specific environmental stress",
+        "Static knockout screens miss dynamic gene function",
+        "Network redundancy masks essentiality under standard conditions"
+      ],
+      "sensitivity_trap": "Models treat essentiality as binary and context-independent, missing conditional and environment-dependent gene function.",
+      "scoring_dimensions": {
+        "factual_accuracy": "Is conditional essentiality concept correctly explained?",
+        "reasoning_consistency": "Does the model connect hypoxic stress to specific metabolic pathway dependencies?",
+        "confidence_calibration": "Does the model acknowledge limitations of standard CRISPR screens?",
+        "domain_depth": "Is network redundancy or synthetic lethality mentioned?"
+      }
+    },
+    {
+      "id": "MB005",
+      "question": "An mRNA molecule has a single nucleotide change in its 5' UTR that does not affect the coding sequence. Explain how this change could have a disproportionately large effect on protein output.",
+      "reasoning_type": "context_dependent_sensitivity",
+      "complexity": "medium",
+      "expected_reasoning_steps": [
+        "5' UTR secondary structure affects ribosome scanning efficiency",
+        "Upstream open reading frames (uORFs) can be created or destroyed",
+        "Kozak sequence alterations affect translation initiation efficiency",
+        "Internal ribosome entry sites (IRES) may be disrupted"
+      ],
+      "sensitivity_trap": "Models focus only on coding sequence changes and underestimate the regulatory importance of UTR regions on translational efficiency.",
+      "scoring_dimensions": {
+        "factual_accuracy": "Are uORFs, Kozak sequence, and secondary structure correctly described?",
+        "reasoning_consistency": "Does the model explain mechanism from UTR change to protein output change?",
+        "confidence_calibration": "Does the model note this is highly sequence and context dependent?",
+        "domain_depth": "Is IRES or eIF4E-dependent translation mentioned?"
+      }
+    }
+  ]
+}
