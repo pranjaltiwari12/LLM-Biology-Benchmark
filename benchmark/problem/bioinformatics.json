@@ -1,0 +1,102 @@
+{
+  "domain": "Bioinformatics",
+  "version": "1.0",
+  "focus": "Quantitative reasoning, pipeline sensitivity, and interpretation of genomics data",
+  "problems": [
+    {
+      "id": "BI001",
+      "question": "An RNA-seq experiment comparing tumour vs normal tissue reports 500 differentially expressed genes at FDR < 0.05. A researcher concludes these 500 genes are biologically meaningful. Describe three reasons why this conclusion may be overconfident.",
+      "reasoning_type": "statistical_sensitivity",
+      "complexity": "medium",
+      "expected_reasoning_steps": [
+        "Statistical significance does not equal biological significance — effect sizes may be small",
+        "Batch effects and technical variation can produce false positives even after FDR correction",
+        "FDR controls false discovery rate across the list, not per-gene confidence",
+        "Confounding variables (tumour purity, cell composition) inflate apparent differential expression"
+      ],
+      "sensitivity_trap": "Models treat FDR-corrected p-values as definitive proof of biological relevance, missing the distinction between statistical and biological significance and the role of confounders.",
+      "scoring_dimensions": {
+        "factual_accuracy": "Is FDR vs biological significance distinction correctly explained?",
+        "reasoning_consistency": "Are three mechanistically distinct reasons provided?",
+        "confidence_calibration": "Does the model suggest validation approaches?",
+        "domain_depth": "Are tumour purity or cell deconvolution issues mentioned?"
+      }
+    },
+    {
+      "id": "BI002",
+      "question": "A variant calling pipeline using GATK HaplotypeCaller reports a somatic SNV with VAF (variant allele frequency) of 3% in a tumour sample. A researcher dismisses this as a sequencing error. Under what conditions would this be a critical mistake?",
+      "reasoning_type": "context_dependent_sensitivity",
+      "complexity": "high",
+      "expected_reasoning_steps": [
+        "Low VAF variants can represent subclonal driver mutations with clinical significance",
+        "Tumour heterogeneity means minor clones may drive therapy resistance",
+        "VAF of 3% in bulk sequencing may represent 6%+ in the actual tumour cell fraction after purity correction",
+        "Known hotspot mutations (e.g. KRAS G12D) at low VAF have high functional significance"
+      ],
+      "sensitivity_trap": "Models apply a uniform VAF threshold for filtering without considering tumour purity, subclonal architecture, or the functional significance of specific mutation hotspots.",
+      "scoring_dimensions": {
+        "factual_accuracy": "Is subclonal evolution and tumour heterogeneity correctly described?",
+        "reasoning_consistency": "Does the model connect low VAF to therapy resistance through clonal dynamics?",
+        "confidence_calibration": "Does the model recommend orthogonal validation (e.g. ddPCR)?",
+        "domain_depth": "Is tumour purity correction or clonal evolution mentioned?"
+      }
+    },
+    {
+      "id": "BI003",
+      "question": "Two RNA-seq datasets from different labs studying the same cancer type show almost no overlap in their differentially expressed gene lists despite similar experimental designs. Rather than concluding the biology is different, what computational and biological explanations should be investigated first?",
+      "reasoning_type": "pipeline_sensitivity",
+      "complexity": "medium",
+      "expected_reasoning_steps": [
+        "Different alignment tools (STAR vs HISAT2) and quantification methods produce different counts",
+        "Batch effects from different sequencing platforms or library preparation",
+        "Different reference genomes or annotation versions alter gene models",
+        "Different statistical thresholds and normalisation methods affect gene lists"
+      ],
+      "sensitivity_trap": "Models jump to biological interpretation of discordant results without first exhaustively examining technical and pipeline sources of variation.",
+      "scoring_dimensions": {
+        "factual_accuracy": "Are pipeline-level sources of variation correctly identified?",
+        "reasoning_consistency": "Does the model prioritise technical over biological explanations?",
+        "confidence_calibration": "Does the model suggest harmonisation approaches?",
+        "domain_depth": "Are specific tools (STAR, DESeq2, edgeR) or normalisation methods mentioned?"
+      }
+    },
+    {
+      "id": "BI004",
+      "question": "In a protein-protein interaction network built from STRING database, a researcher identifies a hub gene with high degree centrality and concludes it is a strong drug target. Using network biology reasoning, explain why this conclusion may be flawed.",
+      "reasoning_type": "network_sensitivity",
+      "complexity": "medium",
+      "expected_reasoning_steps": [
+        "High degree hubs in STRING often include promiscuous interactors with low specificity",
+        "Many STRING interactions are predicted computationally, not experimentally validated",
+        "Hub inhibition causes widespread off-target effects due to many interaction partners",
+        "Network robustness means hubs often have redundant pathways compensating for loss"
+      ],
+      "sensitivity_trap": "Models treat high degree centrality in PPI networks as sufficient evidence for drug targetability without considering interaction quality, redundancy, or toxicity.",
+      "scoring_dimensions": {
+        "factual_accuracy": "Is STRING interaction confidence scoring system mentioned?",
+        "reasoning_consistency": "Does the model address both selectivity and redundancy issues?",
+        "confidence_calibration": "Does the model recommend experimental validation of interactions?",
+        "domain_depth": "Is synthetic lethality or network vulnerability analysis mentioned?"
+      }
+    },
+    {
+      "id": "BI005",
+      "question": "A Nextflow pipeline for whole genome sequencing analysis runs successfully on 10 test samples but fails silently on 2 samples in a 200-sample cohort, producing output files of normal size but with incorrect variant calls. What pipeline design principles would have prevented this, and why is silent failure particularly dangerous in genomics?",
+      "reasoning_type": "pipeline_robustness_sensitivity",
+      "complexity": "medium",
+      "expected_reasoning_steps": [
+        "Checksum validation of output files detects data corruption not visible in file size",
+        "Automated QC metrics (Ti/Tv ratio, variant counts) flag anomalous samples",
+        "Containerisation ensures environment consistency but does not prevent logic errors",
+        "Silent failures in clinical genomics pipelines can lead to missed diagnoses"
+      ],
+      "sensitivity_trap": "Models focus on pipeline execution success without addressing output quality validation, missing that file presence does not guarantee data integrity.",
+      "scoring_dimensions": {
+        "factual_accuracy": "Are specific QC metrics (Ti/Tv ratio, coverage uniformity) correctly described?",
+        "reasoning_consistency": "Does the model distinguish execution success from output correctness?",
+        "confidence_calibration": "Does the model address clinical consequences of silent failures?",
+        "domain_depth": "Is MultiQC, checksums, or automated anomaly detection mentioned?"
+      }
+    }
+  ]
+}
