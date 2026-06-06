@@ -1,102 +1,317 @@
-{
-  "domain": "Molecular Biology",
-  "version": "1.0",
-  "focus": "Context-dependent sensitivity and niche domain depth",
-  "problems": [
-    {
-      "id": "MB001",
-      "question": "A single point mutation in the BRCA1 RING domain disrupts its interaction with BARD1. Explain why this seemingly localised change can lead to genome-wide instability rather than a localised loss of function.",
-      "reasoning_type": "context_dependent_sensitivity",
-      "complexity": "high",
-      "expected_reasoning_steps": [
-        "BRCA1-BARD1 heterodimer is required for E3 ubiquitin ligase activity",
-        "Loss of this activity impairs DNA damage response signalling",
-        "Downstream cascade affects homologous recombination repair globally",
-        "Accumulated unrepaired DSBs across entire genome lead to chromosomal instability"
-      ],
-      "sensitivity_trap": "Models often treat this as a localised protein interaction loss rather than recognising the cascade effect across DNA repair pathways genome-wide.",
-      "scoring_dimensions": {
-        "factual_accuracy": "Is the BRCA1-BARD1 interaction and its role described correctly?",
-        "reasoning_consistency": "Does the model trace the cascade from local mutation to global instability?",
-        "confidence_calibration": "Does the model acknowledge uncertainty in predicting phenotypic severity?",
-        "domain_depth": "Does the model reference homologous recombination and DSB repair specifically?"
-      }
-    },
-    {
-      "id": "MB002",
-      "question": "The TP53 gene is often called the 'guardian of the genome.' A heterozygous loss-of-function mutation in TP53 is observed in a patient. Why might this single allele loss have disproportionately severe consequences compared to what haploinsufficiency alone would predict?",
-      "reasoning_type": "context_dependent_sensitivity",
-      "complexity": "high",
-      "expected_reasoning_steps": [
-        "p53 functions as a tetramer — dominant negative effect of mutant allele",
-        "Mutant p53 can sequester wild-type p53 protein",
-        "Loss of p53-mediated apoptosis and cell cycle arrest",
-        "Gain-of-function mutations in TP53 can actively promote oncogenesis"
-      ],
-      "sensitivity_trap": "Models frequently underestimate severity by treating heterozygous loss as simply 50% reduced function, missing dominant negative and gain-of-function mechanisms.",
-      "scoring_dimensions": {
-        "factual_accuracy": "Is the tetrameric nature of p53 and dominant negative effect described?",
-        "reasoning_consistency": "Does the model go beyond simple haploinsufficiency logic?",
-        "confidence_calibration": "Does the model note that outcome depends on specific mutation type?",
-        "domain_depth": "Does the model distinguish loss-of-function from gain-of-function TP53 mutations?"
-      }
-    },
-    {
-      "id": "MB003",
-      "question": "A researcher inhibits a single kinase in the MAPK/ERK signalling pathway at the level of MEK1. They expect a proportional reduction in downstream ERK activity. Under what biological conditions would this assumption fail, and why?",
-      "reasoning_type": "non_linear_biological_threshold",
-      "complexity": "high",
-      "expected_reasoning_steps": [
-        "MAPK pathway has signal amplification — small upstream changes are amplified",
-        "Feedback loops (negative via MKP phosphatases) complicate linear predictions",
-        "Crosstalk with PI3K/AKT pathway can compensate for MEK inhibition",
-        "Bistability in ERK activation means threshold effects, not proportional response"
-      ],
-      "sensitivity_trap": "Models assume linear dose-response; they miss bistability, feedback loops, and pathway crosstalk that make biological signalling inherently non-linear.",
-      "scoring_dimensions": {
-        "factual_accuracy": "Are feedback mechanisms and pathway crosstalk correctly described?",
-        "reasoning_consistency": "Does the model explain non-linearity mechanistically?",
-        "confidence_calibration": "Does the model note cell-type and context dependency?",
-        "domain_depth": "Is bistability or ultrasensitivity in MAPK signalling mentioned?"
-      }
-    },
-    {
-      "id": "MB004",
-      "question": "In a CRISPR screen, a gene shows no fitness effect when knocked out in standard culture conditions but becomes essential under hypoxic stress. What does this tell us about how models of gene essentiality should be interpreted?",
-      "reasoning_type": "context_dependent_sensitivity",
-      "complexity": "medium",
-      "expected_reasoning_steps": [
-        "Gene essentiality is context-dependent, not absolute",
-        "Conditional essentiality revealed only under specific environmental stress",
-        "Static knockout screens miss dynamic gene function",
-        "Network redundancy masks essentiality under standard conditions"
-      ],
-      "sensitivity_trap": "Models treat essentiality as binary and context-independent, missing conditional and environment-dependent gene function.",
-      "scoring_dimensions": {
-        "factual_accuracy": "Is conditional essentiality concept correctly explained?",
-        "reasoning_consistency": "Does the model connect hypoxic stress to specific metabolic pathway dependencies?",
-        "confidence_calibration": "Does the model acknowledge limitations of standard CRISPR screens?",
-        "domain_depth": "Is network redundancy or synthetic lethality mentioned?"
-      }
-    },
-    {
-      "id": "MB005",
-      "question": "An mRNA molecule has a single nucleotide change in its 5' UTR that does not affect the coding sequence. Explain how this change could have a disproportionately large effect on protein output.",
-      "reasoning_type": "context_dependent_sensitivity",
-      "complexity": "medium",
-      "expected_reasoning_steps": [
-        "5' UTR secondary structure affects ribosome scanning efficiency",
-        "Upstream open reading frames (uORFs) can be created or destroyed",
-        "Kozak sequence alterations affect translation initiation efficiency",
-        "Internal ribosome entry sites (IRES) may be disrupted"
-      ],
-      "sensitivity_trap": "Models focus only on coding sequence changes and underestimate the regulatory importance of UTR regions on translational efficiency.",
-      "scoring_dimensions": {
-        "factual_accuracy": "Are uORFs, Kozak sequence, and secondary structure correctly described?",
-        "reasoning_consistency": "Does the model explain mechanism from UTR change to protein output change?",
-        "confidence_calibration": "Does the model note this is highly sequence and context dependent?",
-        "domain_depth": "Is IRES or eIF4E-dependent translation mentioned?"
-      }
+[
+  {
+    "id": "MB_006",
+    "domain": "molecular_biology",
+    "difficulty": "hard",
+    "reasoning_type": "context_dependent_sensitivity",
+    "question": "A missense mutation in the Tudor domain of SMN1 does not abolish snRNP binding in vitro, yet patients with this mutation develop spinal muscular atrophy. Why might in vitro binding assays fail to predict in vivo pathology in this case?",
+    "reference_answer": "WRITE THIS YOURSELF — your answer must cover: (1) SMN complex requires multivalent interactions across multiple domains, not just Tudor-snRNP binding; (2) in vitro assays lack the crowded nuclear environment and phase separation dynamics of Cajal bodies; (3) SMN protein functions in stoichiometric complexes — reduced affinity in vivo may fall below threshold for functional snRNP assembly; (4) motor neurons have exceptionally high snRNP demand due to their size and axonal transport requirements, making them selectively vulnerable to partial SMN dysfunction.",
+    "expected_reasoning_steps": [
+      "SMN Tudor domain is one of multiple interaction surfaces in the SMN complex",
+      "In vitro assays cannot recapitulate phase-separated Cajal body environment",
+      "Motor neuron-specific vulnerability due to high snRNP biosynthesis demand",
+      "Threshold effects — partial binding loss sufficient to cause pathology in high-demand cells"
+    ],
+    "sensitivity_trap": "Models accept in vitro binding data as sufficient evidence for in vivo function, missing cell-type-specific vulnerability and threshold effects in snRNP assembly.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is SMN complex biology and motor neuron vulnerability correctly described?",
+      "reasoning_consistency": "Does the model explain the gap between in vitro and in vivo results mechanistically?",
+      "confidence_calibration": "Does the model acknowledge the complexity of genotype-phenotype prediction?",
+      "domain_depth": "Is Cajal body biology or phase separation in snRNP assembly mentioned?"
     }
-  ]
-}
+  },
+  {
+    "id": "MB_007",
+    "domain": "molecular_biology",
+    "difficulty": "hard",
+    "reasoning_type": "non_linear_biological_threshold",
+    "question": "Telomerase is expressed at low levels in most somatic cells. A 20% reduction in telomerase activity is observed in a patient's haematopoietic stem cells. Why might this modest reduction have catastrophic long-term consequences disproportionate to its magnitude?",
+    "reference_answer": "WRITE THIS YOURSELF — your answer must cover: (1) telomere shortening is cumulative across cell divisions — small per-division losses compound over decades; (2) haematopoietic stem cells undergo lifelong self-renewal, making them uniquely sensitive to telomere erosion; (3) critically short telomeres trigger p53-mediated senescence or apoptosis in a threshold-dependent manner; (4) stem cell exhaustion has non-linear consequences — once the HSC pool falls below a critical size, haematopoietic failure accelerates rapidly (dyskeratosis congenita model).",
+    "expected_reasoning_steps": [
+      "Telomere shortening is cumulative — small per-division losses compound over time",
+      "HSCs undergo lifelong division — uniquely sensitive to telomerase insufficiency",
+      "Critically short telomeres trigger senescence threshold non-linearly",
+      "HSC pool depletion below critical threshold causes accelerating haematopoietic failure"
+    ],
+    "sensitivity_trap": "Models treat 20% reduction as causing 20% functional impairment, missing the cumulative, threshold-dependent nature of telomere biology.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is telomere biology in HSCs and dyskeratosis congenita correctly described?",
+      "reasoning_consistency": "Does the model trace the path from modest reduction to catastrophic outcome?",
+      "confidence_calibration": "Does the model note penetrance variation and age-of-onset uncertainty?",
+      "domain_depth": "Is the p53-telomere senescence axis or ALT pathway mentioned?"
+    }
+  },
+  {
+    "id": "MB_008",
+    "domain": "molecular_biology",
+    "difficulty": "hard",
+    "reasoning_type": "context_dependent_sensitivity",
+    "question": "A transcription factor binds its consensus motif with high affinity in isolation. In a differentiated cell type, however, ChIP-seq shows no occupancy at these sites. What molecular mechanisms could explain this discrepancy?",
+    "reference_answer": "WRITE THIS YOURSELF — your answer must cover: (1) chromatin accessibility — nucleosome positioning over binding sites prevents access in vivo; (2) pioneer factor requirement — some TFs require prior chromatin opening by pioneer factors (e.g. FOXA1); (3) co-factor dependency — TF activity may require cell-type-specific co-activators absent in this cell type; (4) DNA methylation at CpGs within the motif blocks binding; (5) competitive binding by repressive complexes or other TFs at the same sites.",
+    "expected_reasoning_steps": [
+      "Chromatin accessibility gates TF binding independent of intrinsic affinity",
+      "Pioneer factors required to open compacted chromatin at target sites",
+      "Cell-type-specific co-factors absent in this differentiation state",
+      "DNA methylation within motif can block TF binding in vivo"
+    ],
+    "sensitivity_trap": "Models conflate in vitro binding affinity with in vivo occupancy, ignoring chromatin state, DNA methylation, and co-factor availability.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Are chromatin accessibility, pioneer factors, and DNA methylation correctly described?",
+      "reasoning_consistency": "Does the model systematically explain each mechanism linking affinity to occupancy gap?",
+      "confidence_calibration": "Does the model note that multiple mechanisms may act simultaneously?",
+      "domain_depth": "Is ATAC-seq, pioneer factor biology, or nucleosome remodelling mentioned?"
+    }
+  },
+  {
+    "id": "MB_009",
+    "domain": "molecular_biology",
+    "difficulty": "hard",
+    "reasoning_type": "cascade_reasoning",
+    "question": "A loss-of-function mutation in the deubiquitinase CYLD leads to constitutive NF-κB activation. Trace the molecular cascade from CYLD loss to downstream inflammatory gene expression, identifying at least three non-obvious steps.",
+    "reference_answer": "WRITE THIS YOURSELF — your answer must cover: (1) CYLD removes K63-linked ubiquitin chains from TRAF2/TRAF6/RIP1, keeping them inactive; (2) without CYLD, these adaptors remain K63-ubiquitinated and constitutively active; (3) activated TRAF complexes recruit TAK1, which phosphorylates IKK complex; (4) IKKβ phosphorylates IκBα, targeting it for K48-ubiquitination and proteasomal degradation; (5) free NF-κB (p65/p50) translocates to nucleus; (6) transcription of IL-6, TNF, CXCL8, and anti-apoptotic genes (BCL2, BIRC) — the anti-apoptotic output is the non-obvious step linking CYLD loss to tumourigenesis.",
+    "expected_reasoning_steps": [
+      "CYLD removes K63-ubiquitin from TRAF2/TRAF6 to maintain their inactive state",
+      "Constitutive TRAF activity recruits and activates TAK1",
+      "TAK1 activates IKK complex leading to IκBα phosphorylation and degradation",
+      "NF-κB nuclear translocation drives both inflammatory and anti-apoptotic gene programmes"
+    ],
+    "sensitivity_trap": "Models describe NF-κB activation generically without tracing the specific ubiquitin linkage types (K63 vs K48) that distinguish activation signals from degradation signals.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Are K63 vs K48 ubiquitin linkage distinctions correctly described?",
+      "reasoning_consistency": "Does the model trace the full cascade from CYLD to gene expression?",
+      "confidence_calibration": "Does the model note cell-type specificity of NF-κB target gene repertoire?",
+      "domain_depth": "Is the distinction between K63-linked activation and K48-linked degradation ubiquitin explicitly made?"
+    }
+  },
+  {
+    "id": "MB_010",
+    "domain": "molecular_biology",
+    "difficulty": "hard",
+    "reasoning_type": "context_dependent_sensitivity",
+    "question": "Two patients carry identical heterozygous mutations in LMNA (encoding Lamin A/C). One develops dilated cardiomyopathy, the other develops Emery-Dreifuss muscular dystrophy. How can the same mutation produce two distinct tissue-specific diseases?",
+    "reference_answer": "WRITE THIS YOURSELF — your answer must cover: (1) Lamin A/C interacts with tissue-specific transcription factors and chromatin domains (LADs) differently in cardiac vs muscle cells; (2) mechanical stress hypothesis — cardiomyocytes and skeletal muscle cells experience different mechanical loads, exposing different vulnerabilities in nuclear lamina integrity; (3) tissue-specific expression of Lamin A vs Lamin C isoform ratios modifies mutant protein effect; (4) genetic modifier genes expressed differentially between cardiac and skeletal muscle alter penetrance; (5) this illustrates that genotype-phenotype relationships in structural nuclear proteins are mediated by tissue-specific mechanical and transcriptional environments.",
+    "expected_reasoning_steps": [
+      "Lamin A/C organises tissue-specific chromatin domains (LADs) differently per cell type",
+      "Mechanical stress differs between cardiomyocytes and skeletal myocytes",
+      "Tissue-specific isoform ratios and modifier genes alter mutant phenotype",
+      "Same mutation produces different disease by interacting with different cellular environments"
+    ],
+    "sensitivity_trap": "Models assume one mutation produces one disease, missing tissue-specific environmental and modifier effects on nuclear lamina function.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is laminopathy biology and tissue-specific disease correctly described?",
+      "reasoning_consistency": "Does the model explain the mechanistic basis for tissue specificity?",
+      "confidence_calibration": "Does the model acknowledge incomplete understanding of laminopathy mechanisms?",
+      "domain_depth": "Are lamina-associated domains (LADs) or the mechanical integrity hypothesis mentioned?"
+    }
+  },
+  {
+    "id": "MB_011",
+    "domain": "molecular_biology",
+    "difficulty": "hard",
+    "reasoning_type": "non_linear_biological_threshold",
+    "question": "A cell has lost one copy of the RB1 tumour suppressor. Knudson's two-hit hypothesis predicts a second somatic mutation is required for tumourigenesis. Why might haploinsufficiency alone occasionally be sufficient, and what cellular context determines this?",
+    "reference_answer": "WRITE THIS YOURSELF — your answer must cover: (1) RB protein dosage matters — 50% RB can be insufficient to fully suppress E2F target genes in rapidly dividing cells; (2) in tissues with high proliferative demand, partial RB loss may not adequately restrain CDK4/6-driven cell cycle entry; (3) oncogenic signals (e.g. Ras activation) can overwhelm partial RB suppression through CDK hyperactivation; (4) RB loss cooperates with p16INK4a status — if CDKN2A is already silenced, single RB allele loss may suffice; (5) retinal progenitor cells are specifically sensitive due to their developmental proliferative programme.",
+    "expected_reasoning_steps": [
+      "RB protein dosage determines E2F suppression — haploinsufficiency possible in high-demand tissues",
+      "CDK4/6 hyperactivation can overwhelm single RB allele suppression",
+      "Cooperation with CDKN2A silencing can lower threshold for transformation",
+      "Retinal progenitor cell-specific developmental context explains tissue specificity of retinoblastoma"
+    ],
+    "sensitivity_trap": "Models apply the two-hit model rigidly without considering dosage sensitivity, oncogenic cooperativity, or tissue-specific cell cycle regulation.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is RB-E2F axis and CDK regulation correctly described?",
+      "reasoning_consistency": "Does the model explain conditions under which haploinsufficiency suffices?",
+      "confidence_calibration": "Does the model note this is context- and tissue-dependent?",
+      "domain_depth": "Is CDK4/6-RB-E2F axis or CDKN2A cooperativity specifically mentioned?"
+    }
+  },
+  {
+    "id": "MB_012",
+    "domain": "molecular_biology",
+    "difficulty": "hard",
+    "reasoning_type": "context_dependent_sensitivity",
+    "question": "A long non-coding RNA (lncRNA) is highly expressed in a tumour and correlates with poor prognosis. A researcher knocks it down and observes reduced proliferation. What are the three most common mechanistic traps that lead to incorrect conclusions about lncRNA function from such experiments?",
+    "reference_answer": "WRITE THIS YOURSELF — your answer must cover: (1) lncRNA knockdown disrupts transcription of the locus itself, potentially affecting enhancer activity at the genomic locus independent of the RNA product (DNA-dependent vs RNA-dependent function); (2) correlation with poor prognosis does not establish causality — the lncRNA may be a passenger not a driver; (3) knockdown experiments in cell lines may not recapitulate in vivo function where chromatin context, 3D genome organisation, and cell-cell interactions differ; (4) lncRNAs often act in cis at their own genomic locus — nuclear vs cytoplasmic localisation determines mechanism and must be established before functional conclusions.",
+    "expected_reasoning_steps": [
+      "Knockdown disrupts both RNA and transcriptional activity at the locus — DNA vs RNA function conflation",
+      "Correlation does not establish driver vs passenger status",
+      "Cell line results may not reflect in vivo chromatin and 3D genome context",
+      "Nuclear vs cytoplasmic localisation determines cis vs trans mechanism"
+    ],
+    "sensitivity_trap": "Models accept knockdown + phenotype as sufficient evidence for direct lncRNA function, missing the multiple confounds specific to lncRNA biology.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Are lncRNA-specific mechanistic caveats correctly identified?",
+      "reasoning_consistency": "Does the model distinguish DNA-dependent from RNA-dependent lncRNA function?",
+      "confidence_calibration": "Does the model note that most lncRNA functional claims require multiple orthogonal validations?",
+      "domain_depth": "Is cis vs trans lncRNA action or enhancer RNA conflation mentioned?"
+    }
+  },
+  {
+    "id": "MB_013",
+    "domain": "molecular_biology",
+    "difficulty": "hard",
+    "reasoning_type": "non_linear_biological_threshold",
+    "question": "Phase separation drives the formation of transcriptional condensates at super-enhancers. A mutation reduces the intrinsically disordered region (IDR) of MED1 by 15 amino acids. Why might this small reduction have a disproportionately large effect on transcription of specific genes?",
+    "reference_answer": "WRITE THIS YOURSELF — your answer must cover: (1) phase separation has concentration thresholds — small reductions in IDR valency can shift the system below the critical concentration for condensate formation; (2) condensates form cooperatively, so dissolution is non-linear once below threshold; (3) super-enhancer-driven genes are specifically dependent on condensate-mediated transcriptional amplification — housekeeping genes driven by typical enhancers are unaffected; (4) cell-type-specific master transcription factors (e.g. OCT4 in stem cells) that concentrate in these condensates are disproportionately affected; (5) this illustrates how phase separation thresholds create switch-like rather than graded transcriptional responses.",
+    "expected_reasoning_steps": [
+      "Phase separation has critical concentration thresholds — small IDR changes can shift below threshold",
+      "Condensate formation is cooperative — dissolution is non-linear",
+      "Super-enhancer genes specifically dependent on condensate amplification",
+      "Cell-type master regulators disproportionately concentrated in affected condensates"
+    ],
+    "sensitivity_trap": "Models predict proportional reduction in transcription from proportional IDR reduction, missing the threshold and cooperative nature of phase separation.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is phase separation biology and super-enhancer condensate function correctly described?",
+      "reasoning_consistency": "Does the model explain non-linearity through phase separation thresholds?",
+      "confidence_calibration": "Does the model note that phase separation in transcription is still an active research area?",
+      "domain_depth": "Is the concept of critical concentration or cooperative condensate assembly mentioned?"
+    }
+  },
+  {
+    "id": "MB_014",
+    "domain": "molecular_biology",
+    "difficulty": "hard",
+    "reasoning_type": "context_dependent_sensitivity",
+    "question": "A point mutation in the 3' UTR of HIF-1α mRNA creates a new binding site for miR-210. Under normoxic conditions, this has no measurable effect on HIF-1α protein levels. Under hypoxic conditions, however, HIF-1α protein is paradoxically elevated compared to wild-type. Explain this counterintuitive result.",
+    "reference_answer": "WRITE THIS YOURSELF — your answer must cover: (1) under normoxia, HIF-1α is rapidly degraded by VHL-mediated proteasomal degradation regardless of mRNA levels — so new miR-210 site has no phenotypic consequence; (2) under hypoxia, VHL-mediated degradation is inhibited, HIF-1α protein normally accumulates; (3) miR-210 is itself induced by hypoxia and HIF-1α (positive feedback loop) — the new 3' UTR site creates a negative feedback that limits HIF-1α; (4) paradoxically elevated HIF-1α in mutant suggests the miR-210 site in wild-type 3' UTR normally acts as a brake on HIF-1α under hypoxia — mutation disrupts this brake; (5) illustrates how UTR regulatory elements function conditionally depending on the activity of the upstream signalling pathway.",
+    "expected_reasoning_steps": [
+      "Under normoxia, VHL degradation dominates — mRNA-level regulation irrelevant",
+      "Under hypoxia, VHL inhibited — mRNA-level regulation becomes rate-limiting",
+      "miR-210 is hypoxia-induced and part of HIF-1α negative feedback loop",
+      "New miR-210 site disrupts endogenous feedback brake, elevating HIF-1α paradoxically"
+    ],
+    "sensitivity_trap": "Models predict miR-210 binding site creation would reduce HIF-1α expression, missing the context-dependent switch from protein degradation to mRNA-level regulation under hypoxia.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is HIF-1α regulation by VHL and hypoxic response correctly described?",
+      "reasoning_consistency": "Does the model explain why normoxic and hypoxic effects differ mechanistically?",
+      "confidence_calibration": "Does the model acknowledge this is a complex regulatory scenario with multiple possible interpretations?",
+      "domain_depth": "Is miR-210 as a hypoxamir or HIF-1α negative feedback specifically mentioned?"
+    }
+  },
+  {
+    "id": "MB_015",
+    "domain": "molecular_biology",
+    "difficulty": "hard",
+    "reasoning_type": "cascade_reasoning",
+    "question": "Ribosome stalling during translation of a polyproline sequence triggers the integrated stress response (ISR). Trace the molecular cascade from ribosome stalling to ATF4 translation, identifying why ATF4 is specifically upregulated while global translation is suppressed.",
+    "reference_answer": "WRITE THIS YOURSELF — your answer must cover: (1) polyproline stalling activates EIF2AK4 (GCN2) which senses uncharged tRNA accumulation; (2) GCN2 phosphorylates eIF2α at Ser51; (3) phospho-eIF2α sequesters eIF2B, reducing eIF2-GTP-tRNA ternary complex availability; (4) global cap-dependent translation is suppressed due to limiting ternary complex; (5) ATF4 mRNA has two upstream ORFs (uORFs) in its 5' UTR — under normal conditions ribosomes translate the inhibitory uORF2 and do not reach ATF4 ORF; (6) under limiting ternary complex, ribosomes skip uORF2 due to delayed re-initiation and instead initiate at ATF4 ORF — a rare example of stress-induced translational upregulation.",
+    "expected_reasoning_steps": [
+      "Ribosome stalling activates GCN2 via uncharged tRNA sensing",
+      "GCN2 phosphorylates eIF2α, reducing ternary complex availability",
+      "Global cap-dependent translation suppressed by limiting ternary complex",
+      "ATF4 uORF structure allows preferential translation under limiting eIF2-GTP conditions"
+    ],
+    "sensitivity_trap": "Models describe ISR as uniformly suppressing translation without explaining the uORF-based paradoxical upregulation mechanism specific to ATF4 and other ISR effectors.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is eIF2α phosphorylation and ATF4 uORF biology correctly described?",
+      "reasoning_consistency": "Does the model explain the molecular basis for selective ATF4 upregulation?",
+      "confidence_calibration": "Does the model note that ISR output depends on duration and intensity of stress?",
+      "domain_depth": "Is the specific uORF bypass mechanism or GCN2 activation by uncharged tRNA mentioned?"
+    }
+  },
+  {
+    "id": "MB_016",
+    "domain": "molecular_biology",
+    "difficulty": "hard",
+    "reasoning_type": "context_dependent_sensitivity",
+    "question": "A homozygous loss of DICER1 is embryonic lethal, yet conditional DICER1 knockout in adult hepatocytes causes only modest liver dysfunction. What does this tell us about the context-dependency of miRNA function across developmental and adult tissue states?",
+    "reference_answer": "WRITE THIS YOURSELF — your answer must cover: (1) during embryogenesis, miRNAs are essential for cell fate transitions and tissue patterning — DICER1 loss prevents processing of developmental miRNAs (e.g. miR-290 cluster in ESCs); (2) adult hepatocytes are post-mitotic and transcriptionally stable — less dependent on miRNA-mediated gene regulation for homeostasis; (3) adult tissues have longer-lived mRNAs and more stable transcriptional programmes, reducing acute dependence on miRNA turnover; (4) compensation may occur through alternative RNA regulatory mechanisms (RBPs, lncRNAs) more robustly in adult cells; (5) illustrates that miRNA essentiality is highest during developmental transitions requiring rapid, precise gene expression changes.",
+    "expected_reasoning_steps": [
+      "Embryonic development requires precise miRNA-mediated cell fate transitions",
+      "Adult post-mitotic hepatocytes have stable transcriptional programmes less dependent on miRNA",
+      "Developmental miRNA clusters (e.g. miR-290) essential for embryonic transitions",
+      "Adult tissues have compensatory RNA regulatory mechanisms reducing acute DICER1 dependence"
+    ],
+    "sensitivity_trap": "Models treat DICER1 and miRNA function as uniformly essential across all tissues and developmental stages, missing the context-dependent criticality of miRNA regulation.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is DICER1 biology and developmental vs adult miRNA function correctly described?",
+      "reasoning_consistency": "Does the model explain why developmental lethality contrasts with adult tissue tolerance?",
+      "confidence_calibration": "Does the model note that some adult tissues (e.g. neurons) are more DICER1-dependent than hepatocytes?",
+      "domain_depth": "Are developmental miRNA clusters or RNA-binding protein compensation mentioned?"
+    }
+  },
+  {
+    "id": "MB_017",
+    "domain": "molecular_biology",
+    "difficulty": "hard",
+    "reasoning_type": "non_linear_biological_threshold",
+    "question": "A synthetic biology experiment introduces a positive feedback loop into a gene regulatory network. The circuit shows bistability — two stable expression states. What molecular parameters determine whether the system settles into the high or low expression state, and why is the transition between states non-linear?",
+    "reference_answer": "WRITE THIS YOURSELF — your answer must cover: (1) bistability requires a positive feedback loop with sufficient gain and cooperativity (Hill coefficient >1); (2) initial conditions and stochastic gene expression noise determine which basin of attraction the system enters; (3) transition between states requires crossing an energy barrier — small perturbations are insufficient; (4) cooperativity (e.g. TF dimerisation, cooperative DNA binding) sharpens the switch; (5) the transition is non-linear because the system has two stable fixed points separated by an unstable fixed point — near the unstable point, small changes are amplified into full state transitions; (6) hysteresis means the signal level required to switch on differs from that required to switch off.",
+    "expected_reasoning_steps": [
+      "Bistability requires positive feedback with cooperativity above critical Hill coefficient",
+      "Initial conditions and noise determine basin of attraction",
+      "Energy barrier between states requires threshold perturbation to cross",
+      "Hysteresis — switch-on and switch-off thresholds differ due to bistable topology"
+    ],
+    "sensitivity_trap": "Models describe positive feedback as simply amplifying signal, missing the bistability, hysteresis, and stochastic noise sensitivity that define switch-like behaviour in gene circuits.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Are bistability, cooperativity, and hysteresis correctly described?",
+      "reasoning_consistency": "Does the model explain the mathematical basis for non-linear state transitions?",
+      "confidence_calibration": "Does the model note that stochastic effects in small cell populations affect bistable circuit behaviour?",
+      "domain_depth": "Is Hill coefficient, nullcline analysis, or hysteresis loop specifically mentioned?"
+    }
+  },
+  {
+    "id": "MB_018",
+    "domain": "molecular_biology",
+    "difficulty": "hard",
+    "reasoning_type": "context_dependent_sensitivity",
+    "question": "A patient with Lynch syndrome carries a germline MSH2 mutation. Their colorectal tumours show microsatellite instability (MSI-H) and respond well to immune checkpoint blockade. Their pancreatic tumour, also MSH2-deficient, does not respond to checkpoint blockade. What tumour-intrinsic and microenvironment factors could explain this differential immunotherapy response?",
+    "reference_answer": "WRITE THIS YOURSELF — your answer must cover: (1) MSI-H colorectal tumours have high tumour mutational burden (TMB) generating abundant neoantigens; (2) pancreatic TME is immunosuppressive — dense desmoplastic stroma limits T cell infiltration regardless of neoantigen load; (3) pancreatic tumours have low baseline immune infiltration (cold tumours) compared to colorectal MSI-H tumours (hot tumours); (4) KRAS mutations common in pancreatic cancer drive immunosuppressive cytokine production (TGF-β, IL-10) and myeloid-derived suppressor cell recruitment; (5) WNT/β-catenin activation in pancreatic tumours excludes T cells from TME; (6) illustrates that MSI status alone is insufficient to predict checkpoint blockade response — TME architecture determines immunotherapy efficacy.",
+    "expected_reasoning_steps": [
+      "MSI-H generates neoantigens but neoantigen load alone does not determine response",
+      "Pancreatic TME is desmoplastic and immunosuppressive — limits T cell infiltration",
+      "KRAS-driven myeloid suppression in pancreatic cancer reduces immune infiltrate",
+      "Cold vs hot tumour classification determines checkpoint blockade response independent of MSI status"
+    ],
+    "sensitivity_trap": "Models predict MSI-H status uniformly predicts checkpoint blockade response, missing the dominant role of tumour microenvironment architecture in pancreatic cancer.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is Lynch syndrome biology and pancreatic TME correctly described?",
+      "reasoning_consistency": "Does the model explain TME-specific mechanisms overriding MSI-H neoantigen benefit?",
+      "confidence_calibration": "Does the model acknowledge that checkpoint blockade response prediction remains imperfect?",
+      "domain_depth": "Is desmoplastic stroma, KRAS-driven immunosuppression, or cold tumour biology mentioned?"
+    }
+  },
+  {
+    "id": "MB_019",
+    "domain": "molecular_biology",
+    "difficulty": "hard",
+    "reasoning_type": "cascade_reasoning",
+    "question": "Activation of the unfolded protein response (UPR) initially promotes cell survival but can switch to triggering apoptosis under prolonged ER stress. What molecular timer determines this survival-to-death transition, and why is the switch non-linear?",
+    "reference_answer": "WRITE THIS YOURSELF — your answer must cover: (1) early UPR activates IRE1α-XBP1, ATF6, and PERK-ATF4 to upregulate chaperones and expand ER capacity; (2) PERK phosphorylates eIF2α — initially protective by reducing load; (3) GADD34 (PPP1R15A) is induced by ATF4 as a negative feedback to restore eIF2α phosphorylation and resume translation; (4) if ER stress persists, IRE1α oligomerises and activates RIDD (regulated IRE1-dependent decay) degrading survival mRNAs; (5) prolonged CHOP induction by ATF4 suppresses BCL2 and induces BIM/PUMA; (6) the switch is non-linear because IRE1α oligomerisation is cooperative — above a threshold of unfolded protein load, IRE1α shifts from pro-survival signalling to apoptotic signalling irreversibly.",
+    "expected_reasoning_steps": [
+      "Early UPR activates chaperone upregulation and translational attenuation — pro-survival",
+      "GADD34 negative feedback restores translation as a timer for stress resolution",
+      "Prolonged IRE1α oligomerisation switches from XBP1 splicing to RIDD — pro-apoptotic",
+      "CHOP-mediated BCL2 suppression and BIM induction commits cell to apoptosis non-linearly"
+    ],
+    "sensitivity_trap": "Models describe UPR as uniformly pro-survival or uniformly apoptotic, missing the temporal switch mechanism and the cooperative oligomerisation threshold that determines fate.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is UPR branch biology and CHOP-mediated apoptosis correctly described?",
+      "reasoning_consistency": "Does the model explain the molecular timer and the non-linear switch mechanism?",
+      "confidence_calibration": "Does the model note cell-type specificity of UPR apoptotic threshold?",
+      "domain_depth": "Is RIDD, IRE1α oligomerisation, or GADD34 negative feedback specifically mentioned?"
+    }
+  },
+  {
+    "id": "MB_020",
+    "domain": "molecular_biology",
+    "difficulty": "hard",
+    "reasoning_type": "context_dependent_sensitivity",
+    "question": "A gain-of-function mutation in IDH1 (R132H) produces 2-hydroxyglutarate (2-HG), an oncometabolite. 2-HG competitively inhibits α-ketoglutarate-dependent dioxygenases. Explain why this single metabolic perturbation has such broad epigenetic and cellular consequences, and why the effects are cell-type specific.",
+    "reference_answer": "WRITE THIS YOURSELF — your answer must cover: (1) α-KG-dependent dioxygenases include TET enzymes (DNA demethylation), KDM histone demethylases, and PHD prolyl hydroxylases (HIF regulation); (2) 2-HG inhibition of TET2 causes CpG island hypermethylation — locking cells in a hypermethylated epigenetic state that blocks differentiation; (3) KDM inhibition causes histone hypermethylation (H3K9me3, H3K27me3) — reinforcing gene silencing; (4) PHD inhibition stabilises HIF-1α under normoxia — pseudo-hypoxic state drives metabolic reprogramming; (5) cell-type specificity arises because different cell types have different α-KG/2-HG ratios, different TET/KDM expression levels, and different baseline epigenetic states that determine sensitivity to inhibition; (6) progenitor cells with active differentiation programmes are most sensitive because they require TET-mediated demethylation for lineage commitment.",
+    "expected_reasoning_steps": [
+      "2-HG inhibits TET, KDM, and PHD enzymes — all α-KG-dependent dioxygenases",
+      "TET inhibition causes DNA hypermethylation blocking differentiation",
+      "KDM inhibition causes histone hypermethylation reinforcing repressive chromatin",
+      "Cell-type specificity determined by baseline epigenetic state and dioxygenase expression levels"
+    ],
+    "sensitivity_trap": "Models identify TET inhibition as the sole consequence, missing the broader dioxygenase family inhibition and the cell-type-specific epigenetic state that determines phenotypic outcome.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is 2-HG mechanism and α-KG dioxygenase family correctly described?",
+      "reasoning_consistency": "Does the model trace from single metabolite to broad epigenetic consequences?",
+      "confidence_calibration": "Does the model note that IDH1 mutation effects are context- and cell-type-dependent?",
+      "domain_depth": "Are KDM histone demethylases, PHD-HIF axis, or oncometabolite concept specifically mentioned?"
+    }
+  }
+]
