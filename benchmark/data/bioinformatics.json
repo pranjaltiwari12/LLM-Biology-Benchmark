@@ -1,102 +1,422 @@
-{
-  "domain": "Bioinformatics",
-  "version": "1.0",
-  "focus": "Quantitative reasoning, pipeline sensitivity, and interpretation of genomics data",
-  "problems": [
-    {
-      "id": "BI001",
-      "question": "An RNA-seq experiment comparing tumour vs normal tissue reports 500 differentially expressed genes at FDR < 0.05. A researcher concludes these 500 genes are biologically meaningful. Describe three reasons why this conclusion may be overconfident.",
-      "reasoning_type": "statistical_sensitivity",
-      "complexity": "medium",
-      "expected_reasoning_steps": [
-        "Statistical significance does not equal biological significance — effect sizes may be small",
-        "Batch effects and technical variation can produce false positives even after FDR correction",
-        "FDR controls false discovery rate across the list, not per-gene confidence",
-        "Confounding variables (tumour purity, cell composition) inflate apparent differential expression"
-      ],
-      "sensitivity_trap": "Models treat FDR-corrected p-values as definitive proof of biological relevance, missing the distinction between statistical and biological significance and the role of confounders.",
-      "scoring_dimensions": {
-        "factual_accuracy": "Is FDR vs biological significance distinction correctly explained?",
-        "reasoning_consistency": "Are three mechanistically distinct reasons provided?",
-        "confidence_calibration": "Does the model suggest validation approaches?",
-        "domain_depth": "Are tumour purity or cell deconvolution issues mentioned?"
-      }
-    },
-    {
-      "id": "BI002",
-      "question": "A variant calling pipeline using GATK HaplotypeCaller reports a somatic SNV with VAF (variant allele frequency) of 3% in a tumour sample. A researcher dismisses this as a sequencing error. Under what conditions would this be a critical mistake?",
-      "reasoning_type": "context_dependent_sensitivity",
-      "complexity": "high",
-      "expected_reasoning_steps": [
-        "Low VAF variants can represent subclonal driver mutations with clinical significance",
-        "Tumour heterogeneity means minor clones may drive therapy resistance",
-        "VAF of 3% in bulk sequencing may represent 6%+ in the actual tumour cell fraction after purity correction",
-        "Known hotspot mutations (e.g. KRAS G12D) at low VAF have high functional significance"
-      ],
-      "sensitivity_trap": "Models apply a uniform VAF threshold for filtering without considering tumour purity, subclonal architecture, or the functional significance of specific mutation hotspots.",
-      "scoring_dimensions": {
-        "factual_accuracy": "Is subclonal evolution and tumour heterogeneity correctly described?",
-        "reasoning_consistency": "Does the model connect low VAF to therapy resistance through clonal dynamics?",
-        "confidence_calibration": "Does the model recommend orthogonal validation (e.g. ddPCR)?",
-        "domain_depth": "Is tumour purity correction or clonal evolution mentioned?"
-      }
-    },
-    {
-      "id": "BI003",
-      "question": "Two RNA-seq datasets from different labs studying the same cancer type show almost no overlap in their differentially expressed gene lists despite similar experimental designs. Rather than concluding the biology is different, what computational and biological explanations should be investigated first?",
-      "reasoning_type": "pipeline_sensitivity",
-      "complexity": "medium",
-      "expected_reasoning_steps": [
-        "Different alignment tools (STAR vs HISAT2) and quantification methods produce different counts",
-        "Batch effects from different sequencing platforms or library preparation",
-        "Different reference genomes or annotation versions alter gene models",
-        "Different statistical thresholds and normalisation methods affect gene lists"
-      ],
-      "sensitivity_trap": "Models jump to biological interpretation of discordant results without first exhaustively examining technical and pipeline sources of variation.",
-      "scoring_dimensions": {
-        "factual_accuracy": "Are pipeline-level sources of variation correctly identified?",
-        "reasoning_consistency": "Does the model prioritise technical over biological explanations?",
-        "confidence_calibration": "Does the model suggest harmonisation approaches?",
-        "domain_depth": "Are specific tools (STAR, DESeq2, edgeR) or normalisation methods mentioned?"
-      }
-    },
-    {
-      "id": "BI004",
-      "question": "In a protein-protein interaction network built from STRING database, a researcher identifies a hub gene with high degree centrality and concludes it is a strong drug target. Using network biology reasoning, explain why this conclusion may be flawed.",
-      "reasoning_type": "network_sensitivity",
-      "complexity": "medium",
-      "expected_reasoning_steps": [
-        "High degree hubs in STRING often include promiscuous interactors with low specificity",
-        "Many STRING interactions are predicted computationally, not experimentally validated",
-        "Hub inhibition causes widespread off-target effects due to many interaction partners",
-        "Network robustness means hubs often have redundant pathways compensating for loss"
-      ],
-      "sensitivity_trap": "Models treat high degree centrality in PPI networks as sufficient evidence for drug targetability without considering interaction quality, redundancy, or toxicity.",
-      "scoring_dimensions": {
-        "factual_accuracy": "Is STRING interaction confidence scoring system mentioned?",
-        "reasoning_consistency": "Does the model address both selectivity and redundancy issues?",
-        "confidence_calibration": "Does the model recommend experimental validation of interactions?",
-        "domain_depth": "Is synthetic lethality or network vulnerability analysis mentioned?"
-      }
-    },
-    {
-      "id": "BI005",
-      "question": "A Nextflow pipeline for whole genome sequencing analysis runs successfully on 10 test samples but fails silently on 2 samples in a 200-sample cohort, producing output files of normal size but with incorrect variant calls. What pipeline design principles would have prevented this, and why is silent failure particularly dangerous in genomics?",
-      "reasoning_type": "pipeline_robustness_sensitivity",
-      "complexity": "medium",
-      "expected_reasoning_steps": [
-        "Checksum validation of output files detects data corruption not visible in file size",
-        "Automated QC metrics (Ti/Tv ratio, variant counts) flag anomalous samples",
-        "Containerisation ensures environment consistency but does not prevent logic errors",
-        "Silent failures in clinical genomics pipelines can lead to missed diagnoses"
-      ],
-      "sensitivity_trap": "Models focus on pipeline execution success without addressing output quality validation, missing that file presence does not guarantee data integrity.",
-      "scoring_dimensions": {
-        "factual_accuracy": "Are specific QC metrics (Ti/Tv ratio, coverage uniformity) correctly described?",
-        "reasoning_consistency": "Does the model distinguish execution success from output correctness?",
-        "confidence_calibration": "Does the model address clinical consequences of silent failures?",
-        "domain_depth": "Is MultiQC, checksums, or automated anomaly detection mentioned?"
-      }
+[
+  {
+    "id": "BI_001",
+    "domain": "bioinformatics",
+    "difficulty": "hard",
+    "reasoning_type": "statistical_sensitivity",
+    "question": "An RNA-seq experiment comparing tumour vs normal tissue reports 500 differentially expressed genes at FDR < 0.05. A researcher concludes these 500 genes are biologically meaningful. Describe three reasons why this conclusion may be overconfident.",
+    "reference_answer": "Statistical significance does not equal biological significance — many of the 500 genes may have very small fold changes that are statistically detectable due to large sample size but have no meaningful biological effect. FDR correction controls the expected proportion of false positives across the entire list, not the confidence in any individual gene — at FDR 0.05, up to 25 of the 500 genes are expected to be false positives by definition. Tumour purity and cell composition differences between samples confound differential expression — genes appearing differentially expressed may reflect differences in stromal or immune cell admixture rather than tumour-intrinsic biology. Batch effects from library preparation or sequencing runs can survive FDR correction and produce reproducible but technically-driven false positives.",
+    "expected_reasoning_steps": [
+      "Statistical significance does not equal biological significance — effect sizes may be small",
+      "Batch effects and technical variation can produce false positives even after FDR correction",
+      "FDR controls false discovery rate across the list, not per-gene confidence",
+      "Confounding variables (tumour purity, cell composition) inflate apparent differential expression"
+    ],
+    "sensitivity_trap": "Models treat FDR-corrected p-values as definitive proof of biological relevance, missing the distinction between statistical and biological significance and the role of confounders.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is FDR vs biological significance distinction correctly explained?",
+      "reasoning_consistency": "Are three mechanistically distinct reasons provided?",
+      "confidence_calibration": "Does the model suggest validation approaches?",
+      "domain_depth": "Are tumour purity or cell deconvolution issues mentioned?"
     }
-  ]
-}
+  },
+  {
+    "id": "BI_002",
+    "domain": "bioinformatics",
+    "difficulty": "hard",
+    "reasoning_type": "context_dependent_sensitivity",
+    "question": "A variant calling pipeline using GATK HaplotypeCaller reports a somatic SNV with VAF (variant allele frequency) of 3% in a tumour sample. A researcher dismisses this as a sequencing error. Under what conditions would this be a critical mistake?",
+    "reference_answer": "Dismissing a 3% VAF variant is a critical mistake when the variant occurs at a known oncogenic hotspot such as KRAS G12D or PIK3CA H1047R, where even subclonal presence has functional and therapeutic significance. In tumours with low purity, a 3% bulk VAF may represent 6% or higher frequency within the actual tumour cell population after purity correction, making it a substantial subclonal event. Subclonal driver mutations in genes like TP53, EGFR, or ESR1 can represent pre-existing resistant clones that will expand under selective therapeutic pressure, making their detection clinically actionable. In liquid biopsy or minimal residual disease monitoring contexts, variants at this frequency represent genuine tumour signal and their dismissal leads to false-negative disease assessment. Orthogonal validation with ddPCR or deep targeted sequencing can confirm true low-VAF variants.",
+    "expected_reasoning_steps": [
+      "Low VAF variants can represent subclonal driver mutations with clinical significance",
+      "Tumour heterogeneity means minor clones may drive therapy resistance",
+      "VAF of 3% in bulk sequencing may represent 6%+ in the actual tumour cell fraction after purity correction",
+      "Known hotspot mutations (e.g. KRAS G12D) at low VAF have high functional significance"
+    ],
+    "sensitivity_trap": "Models apply a uniform VAF threshold for filtering without considering tumour purity, subclonal architecture, or the functional significance of specific mutation hotspots.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is subclonal evolution and tumour heterogeneity correctly described?",
+      "reasoning_consistency": "Does the model connect low VAF to therapy resistance through clonal dynamics?",
+      "confidence_calibration": "Does the model recommend orthogonal validation (e.g. ddPCR)?",
+      "domain_depth": "Is tumour purity correction or clonal evolution mentioned?"
+    }
+  },
+  {
+    "id": "BI_003",
+    "domain": "bioinformatics",
+    "difficulty": "hard",
+    "reasoning_type": "pipeline_sensitivity",
+    "question": "Two RNA-seq datasets from different labs studying the same cancer type show almost no overlap in their differentially expressed gene lists despite similar experimental designs. Rather than concluding the biology is different, what computational and biological explanations should be investigated first?",
+    "reference_answer": "Different alignment tools such as STAR versus HISAT2, and different quantification methods such as featureCounts versus Salmon, produce systematically different read count estimates for the same underlying data, directly affecting which genes reach significance. Different reference genome versions or gene annotation builds alter gene model boundaries and multi-mapping resolution, producing different count matrices from identical reads. Batch effects from different sequencing platforms, library preparation kits, or RNA extraction protocols introduce systematic technical variation that drives differential expression independently of biology. Different statistical pipelines such as DESeq2 versus edgeR versus limma-voom, and different normalisation strategies, produce different gene rankings. These technical sources must be exhaustively harmonised before biological conclusions are drawn.",
+    "expected_reasoning_steps": [
+      "Different alignment tools (STAR vs HISAT2) and quantification methods produce different counts",
+      "Batch effects from different sequencing platforms or library preparation",
+      "Different reference genomes or annotation versions alter gene models",
+      "Different statistical thresholds and normalisation methods affect gene lists"
+    ],
+    "sensitivity_trap": "Models jump to biological interpretation of discordant results without first exhaustively examining technical and pipeline sources of variation.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Are pipeline-level sources of variation correctly identified?",
+      "reasoning_consistency": "Does the model prioritise technical over biological explanations?",
+      "confidence_calibration": "Does the model suggest harmonisation approaches?",
+      "domain_depth": "Are specific tools (STAR, DESeq2, edgeR) or normalisation methods mentioned?"
+    }
+  },
+  {
+    "id": "BI_004",
+    "domain": "bioinformatics",
+    "difficulty": "hard",
+    "reasoning_type": "network_sensitivity",
+    "question": "In a protein-protein interaction network built from STRING database, a researcher identifies a hub gene with high degree centrality and concludes it is a strong drug target. Using network biology reasoning, explain why this conclusion may be flawed.",
+    "reference_answer": "High degree centrality in STRING does not reliably identify drug targets because many high-degree hub proteins are promiscuous interactors whose interactions are predicted computationally or text-mined rather than experimentally validated. Inhibiting a hub with many interaction partners is likely to produce widespread off-target effects and toxicity, making it a poor therapeutic candidate despite its network importance. Network robustness means that hub loss is often compensated by redundant pathways or paralogues, so inhibition may have limited efficacy. Degree centrality measures number of interactions but not their functional importance — betweenness centrality or essentiality in context-specific networks is more relevant for target identification. True drug target discovery requires integrating network position with experimental essentiality data, tissue-specific expression, and structural druggability.",
+    "expected_reasoning_steps": [
+      "High degree hubs in STRING often include promiscuous interactors with low specificity",
+      "Many STRING interactions are predicted computationally, not experimentally validated",
+      "Hub inhibition causes widespread off-target effects due to many interaction partners",
+      "Network robustness means hubs often have redundant pathways compensating for loss"
+    ],
+    "sensitivity_trap": "Models treat high degree centrality in PPI networks as sufficient evidence for drug targetability without considering interaction quality, redundancy, or toxicity.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is STRING interaction confidence scoring system mentioned?",
+      "reasoning_consistency": "Does the model address both selectivity and redundancy issues?",
+      "confidence_calibration": "Does the model recommend experimental validation of interactions?",
+      "domain_depth": "Is synthetic lethality or network vulnerability analysis mentioned?"
+    }
+  },
+  {
+    "id": "BI_005",
+    "domain": "bioinformatics",
+    "difficulty": "hard",
+    "reasoning_type": "pipeline_robustness_sensitivity",
+    "question": "A Nextflow pipeline for whole genome sequencing analysis runs successfully on 10 test samples but fails silently on 2 samples in a 200-sample cohort, producing output files of normal size but with incorrect variant calls. What pipeline design principles would have prevented this, and why is silent failure particularly dangerous in genomics?",
+    "reference_answer": "Silent failures are prevented by implementing automated output quality validation independent of execution success. Checksum validation of intermediate and final files detects data corruption invisible from file size alone. Automated QC metrics including Ti/Tv ratio, total variant count, heterozygosity rate, and coverage uniformity should be computed and compared against cohort-wide distributions to flag anomalous samples automatically. The Ti/Tv ratio for whole genome sequencing should be approximately 2.0-2.1 — deviations indicate systematic variant calling errors. Silent failure is particularly dangerous in genomics because downstream analyses including association studies, clinical reporting, and treatment decisions are made on the assumption that variant calls are correct — corrupted data propagates invisibly through the entire analysis without raising errors. Containerisation ensures environment reproducibility but does not substitute for output correctness validation.",
+    "expected_reasoning_steps": [
+      "Checksum validation of output files detects data corruption not visible in file size",
+      "Automated QC metrics (Ti/Tv ratio, variant counts) flag anomalous samples",
+      "Containerisation ensures environment consistency but does not prevent logic errors",
+      "Silent failures in clinical genomics pipelines can lead to missed diagnoses"
+    ],
+    "sensitivity_trap": "Models focus on pipeline execution success without addressing output quality validation, missing that file presence does not guarantee data integrity.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Are specific QC metrics (Ti/Tv ratio, coverage uniformity) correctly described?",
+      "reasoning_consistency": "Does the model distinguish execution success from output correctness?",
+      "confidence_calibration": "Does the model address clinical consequences of silent failures?",
+      "domain_depth": "Is MultiQC, checksums, or automated anomaly detection mentioned?"
+    }
+  },
+  {
+    "id": "BI_006",
+    "domain": "bioinformatics",
+    "difficulty": "hard",
+    "reasoning_type": "statistical_sensitivity",
+    "question": "A GWAS study identifies 12 SNPs significantly associated with Type 2 diabetes at p < 5x10-8. The top hit has an odds ratio of 1.15. A clinician wants to use this panel for patient risk stratification. What are the three most critical quantitative reasons why this would be premature?",
+    "reference_answer": "It is premature because: (1) an OR of 1.15 is a very small effect size that contributes little individual predictive power and only a small absolute risk increase; (2) GWAS SNPs are usually linkage disequilibrium markers rather than the true causal variants, so biological interpretation is uncertain; and (3) 12 SNPs explain only a small fraction of Type 2 diabetes heritability, leaving substantial missing heritability. Polygenic risk scores often transfer poorly across ancestries because LD patterns differ, and population-level significance does not guarantee useful individual-level prediction.",
+    "expected_reasoning_steps": [
+      "OR of 1.15 is modest — small absolute risk increase, low individual predictive power",
+      "GWAS SNPs are LD proxies not necessarily causal variants",
+      "Ancestry-specific LD structure limits cross-population transferability",
+      "12 SNPs explain minimal T2D heritability — missing heritability problem"
+    ],
+    "sensitivity_trap": "Models treat genome-wide significance as clinical actionability, missing the distinction between statistical association, effect size, causality, and clinical utility.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Are effect size interpretation and LD proxy concepts correctly described?",
+      "reasoning_consistency": "Does the model distinguish statistical significance from clinical utility?",
+      "confidence_calibration": "Does the model note ancestry-specific limitations of GWAS?",
+      "domain_depth": "Is missing heritability, LD structure, or polygenic risk score transferability mentioned?"
+    }
+  },
+  {
+    "id": "BI_007",
+    "domain": "bioinformatics",
+    "difficulty": "hard",
+    "reasoning_type": "pipeline_sensitivity",
+    "question": "A single-cell RNA-seq experiment uses the 10x Genomics Chromium platform and Seurat for clustering. The analysis identifies 12 distinct cell clusters. A researcher reports these as 12 distinct cell types. What analytical decisions most strongly influence cluster number, and why should cluster boundaries be treated as probabilistic rather than definitive?",
+    "reference_answer": "Cluster number is heavily influenced by the Louvain/Leiden resolution parameter, the number of principal components used to build the neighborhood graph, and preprocessing choices. Ambient RNA contamination and doublets can create artificial clusters, while batch effects can split one biological population into multiple technical clusters. Because cellular transcriptional states often form a continuum rather than discrete groups, cluster boundaries are probabilistic rather than definitive. Orthogonal validation with protein markers or spatial methods is required before declaring distinct cell types.",
+    "expected_reasoning_steps": [
+      "Resolution parameter directly controls cluster number — arbitrary tuning parameter",
+      "PC selection for neighbourhood graph affects cluster separation",
+      "Doublets and ambient RNA create artifactual clusters",
+      "Transcriptional space is continuous — cluster boundaries are probabilistic cuts"
+    ],
+    "sensitivity_trap": "Models treat computational clusters as discrete biological entities, missing that cluster number is an analyst-controlled parameter and boundaries are probabilistic.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is Louvain/Leiden resolution parameter and its effect correctly described?",
+      "reasoning_consistency": "Does the model distinguish computational clusters from validated cell types?",
+      "confidence_calibration": "Does the model recommend orthogonal validation of cluster identity?",
+      "domain_depth": "Is doublet detection, ambient RNA, or trajectory analysis mentioned?"
+    }
+  },
+  {
+    "id": "BI_008",
+    "domain": "bioinformatics",
+    "difficulty": "hard",
+    "reasoning_type": "quantitative_reasoning",
+    "question": "A ChIP-seq experiment for a transcription factor produces peaks that overlap 60% of the factor's known binding motifs genome-wide. A researcher concludes the remaining 40% of motif sites are not bound in this cell type. What technical and biological reasons might explain the missing 40%, and what would you do to distinguish them?",
+    "reference_answer": "The missing 40% could reflect technical limitations such as poor antibody performance, inaccessible epitopes, insufficient sequencing depth, or stringent peak-calling thresholds that remove genuine low-occupancy sites. Biologically, many motifs may be inaccessible due to closed chromatin, absent co-factors, or cell-type-specific repression. To distinguish technical from biological causes, compare with ATAC-seq accessibility data, use higher-sensitivity methods such as CUT&RUN or CUT&Tag, and evaluate whether altering peak-calling thresholds changes overlap.",
+    "expected_reasoning_steps": [
+      "Antibody quality and epitope accessibility limit ChIP-seq sensitivity",
+      "Peak calling thresholds filter real low-occupancy binding events",
+      "Chromatin accessibility gates binding — some motif sites are genuinely inaccessible",
+      "CUT&RUN or ATAC-seq cross-referencing distinguishes technical from biological absence"
+    ],
+    "sensitivity_trap": "Models interpret absence of ChIP-seq signal as definitive evidence of no binding, missing technical sensitivity limitations and the distinction between inaccessible and unbound sites.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is ChIP-seq sensitivity, peak calling, and antibody bias correctly described?",
+      "reasoning_consistency": "Does the model distinguish technical absence from biological absence of binding?",
+      "confidence_calibration": "Does the model recommend orthogonal approaches to resolve ambiguity?",
+      "domain_depth": "Is CUT&RUN, ATAC-seq cross-referencing, or MACS2 thresholding mentioned?"
+    }
+  },
+  {
+    "id": "BI_009",
+    "domain": "bioinformatics",
+    "difficulty": "hard",
+    "reasoning_type": "pipeline_sensitivity",
+    "question": "A metagenomic study of gut microbiome composition uses 16S rRNA amplicon sequencing with the V3-V4 hypervariable region. The study reports significant differences in species diversity between two patient cohorts. What are the three most serious technical limitations that prevent strong causal conclusions from this data?",
+    "reference_answer": "Three major limitations are: (1) V3-V4 16S sequencing often lacks species-level resolution, making species-specific conclusions unreliable; (2) primer bias systematically over- or under-represents certain taxa, affecting diversity estimates; and (3) 16S copy number varies substantially among bacteria, making relative abundance estimates potentially misleading. Additional concerns include extraction bias, OTU/ASV processing choices, and the fact that observed microbiome differences may be consequences rather than causes of disease. Shotgun metagenomics provides higher-resolution validation.",
+    "expected_reasoning_steps": [
+      "16S provides genus-level resolution at best — species claims unwarranted",
+      "Primer bias systematically underrepresents certain phyla",
+      "16S copy number variation makes relative abundance estimates unreliable without correction",
+      "DNA extraction bias differentially affects gram-positive vs gram-negative bacteria"
+    ],
+    "sensitivity_trap": "Models accept 16S diversity metrics as accurate species-level community profiles, missing primer bias, copy number variation, and extraction artefacts.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Are 16S limitations including primer bias and copy number variation correctly described?",
+      "reasoning_consistency": "Does the model distinguish technical limitations from biological conclusions?",
+      "confidence_calibration": "Does the model recommend shotgun metagenomics as a higher-resolution alternative?",
+      "domain_depth": "Is rRNA operon copy number variation, ASV vs OTU distinction, or primer bias mentioned?"
+    }
+  },
+  {
+    "id": "BI_010",
+    "domain": "bioinformatics",
+    "difficulty": "hard",
+    "reasoning_type": "statistical_sensitivity",
+    "question": "A proteomics study using label-free quantification (LFQ) in MaxQuant identifies 200 differentially abundant proteins between two conditions. Fifty of these proteins are mitochondrial. A researcher concludes there is a specific mitochondrial stress response. What analytical confound should be ruled out before this conclusion is accepted?",
+    "reference_answer": "Before claiming a mitochondrial stress response, the most important confound to exclude is differential mitochondrial contamination during sample preparation. If one condition contains more mitochondrial material because of lysis or fractionation artifacts, many mitochondrial proteins will appear elevated simultaneously. LFQ normalization assumptions and missing-value imputation can further amplify compartment-specific biases. Enrichment of mitochondrial proteins alone is therefore not sufficient evidence of biological mitochondrial stress.",
+    "expected_reasoning_steps": [
+      "Co-fractionation artefact from differential mitochondrial contamination during lysis",
+      "LFQ normalisation assumes stable global proteome — violated if cell composition differs",
+      "Missing value imputation creates correlated false positives within compartments",
+      "Co-regulated mitochondrial proteins produce clustered false positives from single upstream change"
+    ],
+    "sensitivity_trap": "Models accept pathway enrichment of proteomics hits as direct evidence of biological pathway activation, missing systematic technical confounds that produce compartment-specific clustering of false positives.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is LFQ normalisation assumption and co-fractionation artefact correctly described?",
+      "reasoning_consistency": "Does the model identify the specific confound before accepting the biological conclusion?",
+      "confidence_calibration": "Does the model recommend subcellular fractionation controls?",
+      "domain_depth": "Is MaxQuant LFQ normalisation, missing value imputation, or co-fractionation artefact mentioned?"
+    }
+  },
+  {
+    "id": "BI_011",
+    "domain": "bioinformatics",
+    "difficulty": "hard",
+    "reasoning_type": "quantitative_reasoning",
+    "question": "A whole exome sequencing study of 500 cancer patients uses a panel-of-normals (PoN) to filter germline variants from somatic calls. Three samples show an unusually high somatic mutation burden after PoN filtering. Before concluding these are hypermutator phenotypes, what alternative explanations must be systematically excluded?",
+    "reference_answer": "Alternative explanations include sample contamination, low tumor purity causing germline variants to appear somatic, FFPE-induced oxidative damage artifacts (especially C>A transversions from 8-oxoguanine), inadequate ancestry matching in the panel of normals, and copy-number-driven variant inflation. Only after excluding these technical explanations should true hypermutator mechanisms such as POLE/POLD1 mutations or mismatch repair deficiency be considered. Orthogonal validation with MSI testing and targeted sequencing is advisable.",
+    "expected_reasoning_steps": [
+      "Sample contamination inflates apparent somatic mutation burden",
+      "FFPE oxidative damage artefacts mimic somatic C>A mutations",
+      "Low tumour purity causes germline variants to appear somatic",
+      "PoN ancestry mismatch fails to filter population-specific germline variants"
+    ],
+    "sensitivity_trap": "Models accept high TMB as direct evidence of hypermutator phenotype without systematically excluding technical artefacts that produce the same signature.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Are FFPE artefacts, contamination, and PoN limitations correctly described?",
+      "reasoning_consistency": "Does the model systematically exclude technical before biological explanations?",
+      "confidence_calibration": "Does the model recommend orthogonal validation (e.g. MSI testing, POLE sequencing)?",
+      "domain_depth": "Is FFPE 8-oxoguanine artefact, PoN ancestry matching, or tumour purity correction mentioned?"
+    }
+  },
+  {
+    "id": "BI_012",
+    "domain": "bioinformatics",
+    "difficulty": "hard",
+    "reasoning_type": "pipeline_sensitivity",
+    "question": "A long-read nanopore sequencing assembly of a bacterial genome produces a single contig of the expected size. The researcher declares the assembly complete and closes the genome. What validation steps are being skipped, and why does contig count alone not indicate assembly accuracy?",
+    "reference_answer": "A single contig demonstrates contiguity, not accuracy. Nanopore assemblies can retain homopolymer and base-calling errors that require polishing with tools such as Medaka or short-read correction. Repeats may be collapsed, creating an apparently complete but inaccurate genome. Completeness should be assessed using BUSCO, structural correctness verified through short-read mapping and coverage analysis, and assembly graphs examined for missed plasmids or unresolved structures.",
+    "expected_reasoning_steps": [
+      "Contig count indicates contiguity not sequence accuracy — homopolymer errors persist",
+      "Nanopore raw error rate requires polishing before reference-grade accuracy",
+      "Collapsed repeats produce compact but inaccurate assemblies",
+      "BUSCO completeness and short-read polishing required for assembly validation"
+    ],
+    "sensitivity_trap": "Models equate single-contig assembly with complete and accurate genome, missing the distinction between contiguity and accuracy and the systematic error modes of nanopore sequencing.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is nanopore error profile and homopolymer issue correctly described?",
+      "reasoning_consistency": "Does the model distinguish contiguity from accuracy and completeness?",
+      "confidence_calibration": "Does the model recommend specific validation tools (BUSCO, Medaka, short-read polishing)?",
+      "domain_depth": "Is BUSCO, Medaka polishing, collapsed repeat detection, or assembly graph analysis mentioned?"
+    }
+  },
+  {
+    "id": "BI_013",
+    "domain": "bioinformatics",
+    "difficulty": "hard",
+    "reasoning_type": "statistical_sensitivity",
+    "question": "A survival analysis in a cancer cohort shows that high expression of Gene X is associated with poor prognosis (log-rank p = 0.002, HR = 2.3). A researcher concludes Gene X is a prognostic biomarker. What are the four most important analytical and biological caveats before this conclusion is accepted?",
+    "reference_answer": "Four major caveats are: (1) the expression cutoff may have been selected post hoc to maximize significance, inflating the p-value; (2) Gene X may correlate with established prognostic factors such as stage or grade, requiring multivariate Cox regression to demonstrate independence; (3) validation in an independent cohort is essential; and (4) prognostic association does not imply predictive or actionable value. Tumor purity and immune-cell composition can also confound expression-based associations.",
+    "expected_reasoning_steps": [
+      "Post-hoc cutoff selection inflates p-value — requires multiple testing correction",
+      "Multivariate Cox regression needed to establish independence from clinical covariates",
+      "Independent cohort validation required before biomarker claim",
+      "Prognostic association does not equal predictive or actionable biomarker"
+    ],
+    "sensitivity_trap": "Models accept univariate survival association as sufficient evidence for prognostic biomarker status, missing cutoff inflation, confounding, and the distinction between prognostic and predictive value.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is cutoff inflation, Cox regression, and prognostic vs predictive distinction correctly described?",
+      "reasoning_consistency": "Does the model systematically address all four caveats?",
+      "confidence_calibration": "Does the model note that most published biomarkers fail independent validation?",
+      "domain_depth": "Is log-rank cutoff optimisation bias, multivariate Cox regression, or independent cohort validation mentioned?"
+    }
+  },
+  {
+    "id": "BI_014",
+    "domain": "bioinformatics",
+    "difficulty": "hard",
+    "reasoning_type": "quantitative_reasoning",
+    "question": "An ATAC-seq experiment identifies 50,000 open chromatin peaks in a cell line. A researcher overlaps these with a list of GWAS SNPs for a complex disease and finds 300 SNPs in peaks. They conclude these are the functional variants. What quantitative and methodological steps are required before any of these 300 SNPs can be considered functionally validated?",
+    "reference_answer": "Before considering any of the 300 SNPs functional, one must first determine whether the overlap exceeds random expectation using a matched background model. GWAS loci require LD fine-mapping using tools such as SuSiE or FINEMAP because the overlapping SNP may not be causal. Disease-relevant primary tissues should be tested, not just cell lines. Functional validation requires evidence that the variant alters TF binding, chromatin accessibility, gene expression, or enhancer activity through approaches such as allele-specific ATAC-seq, eQTL colocalization, or MPRA assays.",
+    "expected_reasoning_steps": [
+      "Statistical enrichment over background must be calculated — raw overlap count is uninformative",
+      "LD fine-mapping required to identify credible causal variants within loci",
+      "Cell line open chromatin may not represent disease-relevant tissue",
+      "Functional validation requires allele-specific evidence not just positional overlap"
+    ],
+    "sensitivity_trap": "Models treat positional overlap between GWAS SNPs and ATAC-seq peaks as functional validation, missing the requirement for statistical enrichment, fine-mapping, and allele-specific functional evidence.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is LD fine-mapping, credible set analysis, and eQTL colocalisation correctly described?",
+      "reasoning_consistency": "Does the model distinguish positional overlap from functional validation?",
+      "confidence_calibration": "Does the model note the low prior probability of any individual GWAS variant being causal?",
+      "domain_depth": "Is SuSiE/FINEMAP fine-mapping, MPRA, eQTL colocalisation, or allele-specific ATAC mentioned?"
+    }
+  },
+  {
+    "id": "BI_015",
+    "domain": "bioinformatics",
+    "difficulty": "hard",
+    "reasoning_type": "pipeline_sensitivity",
+    "question": "A bulk RNA-seq deconvolution analysis using CIBERSORT estimates immune cell composition in 100 tumour samples. The analysis shows a significant increase in M2 macrophages in treated vs untreated samples. What are the three most serious limitations of computational deconvolution that should temper this conclusion?",
+    "reference_answer": "The three most important limitations are: (1) deconvolution accuracy depends strongly on the reference signature matrix and may fail if macrophage signatures differ from those in the analyzed tumors; (2) macrophages exist on a continuum, so the M1/M2 classification is an oversimplified computational construct; and (3) deconvolution estimates relative proportions, meaning an apparent increase in M2 macrophages may actually reflect decreases in other cell populations. Treatment-induced transcriptional reprogramming can also be mistaken for changes in cell abundance. Validation with single-cell or spatial methods is recommended.",
+    "expected_reasoning_steps": [
+      "Reference signature matrix tissue-specificity determines deconvolution accuracy",
+      "M1/M2 binary classification is a modelling artefact — macrophages exist on a continuum",
+      "Compositional data — increased M2 proportion may reflect decreased other populations",
+      "Treatment alters transcriptional state not just cell composition — deconvolution conflates both"
+    ],
+    "sensitivity_trap": "Models accept CIBERSORT deconvolution estimates as direct measures of cell abundance, missing reference matrix limitations, compositional data problems, and the M1/M2 binary classification artefact.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is CIBERSORT reference matrix dependency and M1/M2 classification limitation correctly described?",
+      "reasoning_consistency": "Does the model identify compositional data issues and transcriptional state confounding?",
+      "confidence_calibration": "Does the model recommend single-cell RNA-seq or multiplexed imaging for validation?",
+      "domain_depth": "Is compositional data analysis, reference matrix bias, or macrophage polarisation continuum mentioned?"
+    }
+  },
+  {
+    "id": "BI_016",
+    "domain": "bioinformatics",
+    "difficulty": "hard",
+    "reasoning_type": "quantitative_reasoning",
+    "question": "A deep learning model trained on whole-slide histology images achieves AUC = 0.94 on a held-out test set for predicting EGFR mutation status. A researcher proposes deploying this model clinically. What are the most critical validation requirements before clinical deployment, and why is AUC on a held-out test set insufficient?",
+    "reference_answer": "AUC = 0.94 on a held-out test set from the same institution is insufficient because training and testing data share staining protocols, scanner characteristics, and site-specific biases. External multi-center validation is required to assess generalizability. The model must also be calibrated, evaluated at clinically relevant sensitivity/specificity thresholds, assessed for positive predictive value in the target population, and tested for spurious correlations. Regulatory approval and prospective evidence of clinical benefit are necessary before deployment.",
+    "expected_reasoning_steps": [
+      "Same-institution test set shares batch effects — external validation required",
+      "AUC does not capture clinical utility at deployment operating point",
+      "Model calibration required for reliable probability estimates",
+      "Spurious correlations from single-site training may not generalise"
+    ],
+    "sensitivity_trap": "Models treat high AUC on held-out test data as sufficient evidence for clinical deployment, missing external validation, calibration, clinical utility assessment, and regulatory requirements.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is external validation, calibration, and clinical utility assessment correctly described?",
+      "reasoning_consistency": "Does the model explain why same-institution test sets are insufficient?",
+      "confidence_calibration": "Does the model note that most published medical AI models fail external validation?",
+      "domain_depth": "Is model calibration, net benefit analysis, prospective trial requirement, or regulatory approval mentioned?"
+    }
+  },
+  {
+    "id": "BI_017",
+    "domain": "bioinformatics",
+    "difficulty": "hard",
+    "reasoning_type": "pipeline_sensitivity",
+    "question": "A Hi-C experiment maps 3D genome organisation in two cell types and identifies 200 differential topologically associating domains (TADs). A researcher concludes these represent cell-type-specific gene regulatory differences. What analytical decisions most strongly influence TAD calls, and why should differential TAD analysis be interpreted cautiously?",
+    "reference_answer": "TAD calls are highly sensitive to sequencing depth, contact-map resolution, and the TAD-calling algorithm used, such as insulation score, directionality index, or Arrowhead. Different methods can produce different boundary sets from the same data. Cell-cycle differences between samples may also create apparent TAD changes. Most importantly, altered TAD structure does not automatically imply altered gene regulation; functional validation with expression data, enhancer-promoter interaction assays, or imaging approaches is required.",
+    "expected_reasoning_steps": [
+      "TAD boundary calls are algorithm-dependent — different tools give different boundaries",
+      "Sequencing depth and resolution strongly affect TAD call stability",
+      "Cell cycle distribution differences between samples produce artifactual differential TADs",
+      "TAD boundary changes require functional validation — altered contacts do not equal altered gene expression"
+    ],
+    "sensitivity_trap": "Models treat computationally called TAD differences as direct evidence of regulatory reorganisation, missing algorithm dependency, depth sensitivity, and the requirement for functional validation.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is TAD calling algorithm dependency and resolution sensitivity correctly described?",
+      "reasoning_consistency": "Does the model distinguish computational TAD calls from functional regulatory evidence?",
+      "confidence_calibration": "Does the model recommend orthogonal validation (e.g. 4C, FISH, gene expression)?",
+      "domain_depth": "Is insulation score, directionality index, cell cycle confounding, or enhancer-promoter contact validation mentioned?"
+    }
+  },
+  {
+    "id": "BI_018",
+    "domain": "bioinformatics",
+    "difficulty": "hard",
+    "reasoning_type": "statistical_sensitivity",
+    "question": "A multi-omics integration study combines RNA-seq, ATAC-seq, and methylation data from the same samples using a late integration approach. The integrated model shows improved prediction of clinical outcome over any single modality. What statistical pitfalls specific to multi-omics integration could make this improvement illusory?",
+    "reference_answer": "Apparent improvement in multi-omics prediction may result from overfitting due to increased feature numbers, especially in small cohorts. Incorrect cross-validation can introduce data leakage when feature selection or integration uses information from test samples. Many features across modalities are highly correlated and may not provide independent information. Non-random missing data can introduce selection bias. Independent external validation is essential to demonstrate genuine predictive improvement.",
+    "expected_reasoning_steps": [
+      "Additional modalities increase features — improvement may reflect overfitting in small cohorts",
+      "Data leakage in cross-validation across modalities inflates apparent performance",
+      "Correlated features across modalities add redundancy not independent information",
+      "Missing data patterns are non-random — selection bias in complete-case analysis"
+    ],
+    "sensitivity_trap": "Models accept multi-omics integration performance improvement at face value, missing overfitting, data leakage, correlated feature inflation, and non-random missing data bias.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is overfitting, data leakage, and correlated feature inflation correctly described?",
+      "reasoning_consistency": "Does the model identify multiple distinct statistical pitfalls?",
+      "confidence_calibration": "Does the model recommend independent cohort validation?",
+      "domain_depth": "Is data leakage in cross-validation, missing data imputation bias, or feature correlation redundancy specifically mentioned?"
+    }
+  },
+  {
+    "id": "BI_019",
+    "domain": "bioinformatics",
+    "difficulty": "hard",
+    "reasoning_type": "quantitative_reasoning",
+    "question": "A phylogenetic analysis of 50 bacterial isolates from a hospital outbreak uses maximum likelihood with a GTR+G model. The resulting tree shows all outbreak isolates clustering together with 100% bootstrap support. An infection control team concludes the outbreak is clonal. What molecular epidemiology considerations could challenge this conclusion?",
+    "reference_answer": "A cluster with 100% bootstrap support is not necessarily a clonal outbreak. Bootstrap support measures topological consistency, not absolute accuracy. Recombination can violate phylogenetic assumptions and should be removed using tools such as Gubbins or ClonalFrameML. Core-genome SNP distances must be evaluated because sequencing errors become important when isolates differ by only a few SNPs. Tree clustering alone does not prove transmission; epidemiological evidence such as timing, location, and contact tracing is required.",
+    "expected_reasoning_steps": [
+      "Bootstrap support reflects topology stability not branch length accuracy — unreliable with few SNPs",
+      "Recombination violates phylogenetic model assumptions — must be detected and removed",
+      "Core genome SNP distance context required — few SNPs means sequencing error is significant",
+      "Genomic clustering requires epidemiological corroboration for transmission inference"
+    ],
+    "sensitivity_trap": "Models accept high bootstrap support phylogenetic clustering as definitive evidence of clonal outbreak, missing recombination, SNP distance context, and the distinction between genomic relatedness and transmission.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is recombination detection, bootstrap interpretation, and SNP distance context correctly described?",
+      "reasoning_consistency": "Does the model distinguish genomic clustering from proven transmission?",
+      "confidence_calibration": "Does the model recommend Gubbins/ClonalFrameML and epidemiological corroboration?",
+      "domain_depth": "Is Gubbins recombination removal, homoplasy, core genome SNP threshold, or transmission inference specifically mentioned?"
+    }
+  },
+  {
+    "id": "BI_020",
+    "domain": "bioinformatics",
+    "difficulty": "hard",
+    "reasoning_type": "pipeline_sensitivity",
+    "question": "A researcher runs a gene set enrichment analysis (GSEA) on a ranked list of differentially expressed genes and finds significant enrichment of 'oxidative phosphorylation' (NES = 2.1, FDR = 0.001). They conclude the treatment activates mitochondrial metabolism. What are the three most important analytical caveats before this biological conclusion is accepted?",
+    "reference_answer": "Three key caveats are: (1) GSEA results depend strongly on the ranking metric used, and different ranking strategies can produce different enrichment scores; (2) oxidative phosphorylation gene sets overlap extensively with other mitochondrial gene sets, so enrichment may reflect a general mitochondrial signature rather than specific OXPHOS activation; and (3) GSEA measures coordinated gene expression changes, not actual metabolic activity. Increased mitochondrial content, altered cell composition, or transcriptional changes can all produce OXPHOS enrichment without increased respiration. Functional assays such as Seahorse analysis are required to confirm metabolic activation.",
+    "expected_reasoning_steps": [
+      "Ranking metric choice (log2FC vs signal-to-noise) affects enrichment results",
+      "Overlapping gene sets in MSigDB mean OXPHOS enrichment may reflect general mitochondrial signature",
+      "GSEA detects expression changes not metabolic activity — functional assays required",
+      "Cell composition changes can produce OXPHOS enrichment without per-cell metabolic change"
+    ],
+    "sensitivity_trap": "Models accept GSEA enrichment of a metabolic pathway as direct evidence of metabolic activation, missing ranking metric sensitivity, gene set overlap, and the distinction between gene expression and metabolic activity.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is GSEA ranking metric sensitivity and gene set overlap correctly described?",
+      "reasoning_consistency": "Does the model distinguish gene expression enrichment from metabolic activity?",
+      "confidence_calibration": "Does the model recommend functional metabolic assays for validation?",
+      "domain_depth": "Is ranking metric choice, MSigDB gene set overlap, Seahorse assay, or cell composition confounding mentioned?"
+    }
+  }
+]
