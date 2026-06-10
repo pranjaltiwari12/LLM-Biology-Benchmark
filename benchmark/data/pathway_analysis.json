@@ -1,102 +1,422 @@
-{
-  "domain": "Pathway Analysis",
-  "version": "1.0",
-  "focus": "Systems-level reasoning and cascade sensitivity in biological networks",
-  "problems": [
-    {
-      "id": "PA001",
-      "question": "In a protein-protein interaction network of a cancer cell, a hub protein with 47 interaction partners is inhibited by a drug. A peripheral protein with only 2 interaction partners is also inhibited by a different drug. Explain why the peripheral protein's inhibition might produce a more severe phenotype in certain network contexts.",
-      "reasoning_type": "network_sensitivity",
-      "complexity": "high",
-      "expected_reasoning_steps": [
-        "Hub proteins often have redundant pathways compensating for their loss",
-        "Peripheral proteins at network bottlenecks control information flow between modules",
-        "Betweenness centrality, not degree, determines criticality for signal transmission",
-        "Essential bridges between network communities cause cascade failures if removed"
-      ],
-      "sensitivity_trap": "Models assume hub proteins are always more critical due to high degree centrality, missing the concept of betweenness centrality and network bottlenecks.",
-      "scoring_dimensions": {
-        "factual_accuracy": "Is the distinction between degree centrality and betweenness centrality correct?",
-        "reasoning_consistency": "Does the model explain how a low-degree bottleneck causes cascade failure?",
-        "confidence_calibration": "Does the model acknowledge this depends on network topology?",
-        "domain_depth": "Are network modules or community structure mentioned?"
-      }
-    },
-    {
-      "id": "PA002",
-      "question": "The NF-kB signalling pathway has both positive and negative feedback loops. A researcher applies a sustained, low-level inflammatory stimulus expecting a proportional, sustained NF-kB activation. Describe two scenarios where this assumption would fail and explain the underlying mechanism.",
-      "reasoning_type": "non_linear_biological_threshold",
-      "complexity": "high",
-      "expected_reasoning_steps": [
-        "Negative feedback via IkB resynthesis causes oscillatory rather than sustained activation",
-        "Bistability can cause switch-like all-or-nothing responses at certain stimulus thresholds",
-        "Adaptation mechanisms cause desensitisation to sustained low-level stimuli",
-        "Crosstalk with p38 MAPK can alter the dynamics of NF-kB response"
-      ],
-      "sensitivity_trap": "Models predict linear proportional responses to stimuli, missing oscillatory dynamics, bistability, and adaptation that are hallmarks of feedback-regulated pathways.",
-      "scoring_dimensions": {
-        "factual_accuracy": "Is IkB negative feedback and its role in NF-kB oscillation correctly described?",
-        "reasoning_consistency": "Are two mechanistically distinct failure scenarios provided?",
-        "confidence_calibration": "Does the model note cell-type and stimulus-context dependency?",
-        "domain_depth": "Is bistability or oscillatory NF-kB dynamics mentioned specifically?"
-      }
-    },
-    {
-      "id": "PA003",
-      "question": "During SARS-CoV-2 infection, the viral protein NSP1 globally suppresses host mRNA translation. Yet certain host immune transcripts escape this suppression. Explain how this selectivity arises and why a model that treats NSP1 as a uniform translational suppressor would fail to predict immune outcomes.",
-      "reasoning_type": "context_dependent_sensitivity",
-      "complexity": "high",
-      "expected_reasoning_steps": [
-        "NSP1 blocks ribosome entry channel — mRNAs with IRES elements or specific 5' UTR features escape",
-        "Stress granule formation redistributes translation machinery selectively",
-        "Certain ISGs have specialised translation initiation mechanisms resistant to NSP1",
-        "Uniform suppression model misses selective advantage given to immune evasion"
-      ],
-      "sensitivity_trap": "Models treat NSP1 suppression as uniform and global, missing the selective escape mechanisms that determine the actual immune response and disease outcome.",
-      "scoring_dimensions": {
-        "factual_accuracy": "Is NSP1 ribosome binding mechanism and IRES escape described correctly?",
-        "reasoning_consistency": "Does the model connect selective translation to immune evasion outcomes?",
-        "confidence_calibration": "Does the model acknowledge this is an active research area with incomplete understanding?",
-        "domain_depth": "Are ISGs or stress granule dynamics mentioned?"
-      }
-    },
-    {
-      "id": "PA004",
-      "question": "A systems biology model predicts that inhibiting glycolysis in a tumour cell will eliminate ATP production and cause cell death. In practice, many cancer cells survive glycolysis inhibition. Using pathway-level reasoning, explain why the model's prediction fails.",
-      "reasoning_type": "metabolic_network_sensitivity",
-      "complexity": "medium",
-      "expected_reasoning_steps": [
-        "Cancer cells exhibit metabolic plasticity — can switch to oxidative phosphorylation",
-        "Pentose phosphate pathway provides alternative carbon routing",
-        "Glutamine-driven anaplerosis compensates for glycolytic loss",
-        "Tumour microenvironment provides alternative substrates (fatty acids, lactate)"
-      ],
-      "sensitivity_trap": "Models treat glycolysis as the sole ATP source in cancer, missing metabolic network redundancy and plasticity that characterise actual tumour metabolism.",
-      "scoring_dimensions": {
-        "factual_accuracy": "Are alternative metabolic pathways correctly identified?",
-        "reasoning_consistency": "Does the model explain the switch mechanism rather than just listing alternatives?",
-        "confidence_calibration": "Does the model note cancer-type and microenvironment dependency?",
-        "domain_depth": "Is glutamine anaplerosis or the Warburg effect discussed?"
-      }
-    },
-    {
-      "id": "PA005",
-      "question": "In a gene regulatory network, transcription factor A activates gene B, which encodes a repressor of gene C. Gene C encodes an activator of transcription factor A. A researcher knocks out gene B expecting to increase gene C expression proportionally. Explain why the actual outcome may be far more complex.",
-      "reasoning_type": "network_feedback_sensitivity",
-      "complexity": "medium",
-      "expected_reasoning_steps": [
-        "Knockout of B relieves repression of C — initial increase in C expression",
-        "Increased C activates A, creating a positive feedback loop",
-        "Positive feedback can drive expression to a new stable state — bistability",
-        "The new equilibrium may be far from proportional — switch-like behaviour"
-      ],
-      "sensitivity_trap": "Models predict proportional linear responses in gene regulatory networks, missing that feedback loops create non-linear dynamics, bistability, and switch-like state transitions.",
-      "scoring_dimensions": {
-        "factual_accuracy": "Is the feedback loop structure correctly traced?",
-        "reasoning_consistency": "Does the model predict bistability or oscillation rather than proportional response?",
-        "confidence_calibration": "Does the model note that outcome depends on rate constants and expression thresholds?",
-        "domain_depth": "Is bistability, hysteresis, or toggle switch network motif mentioned?"
-      }
+[
+  {
+    "id": "PA_001",
+    "domain": "pathway_analysis",
+    "difficulty": "hard",
+    "reasoning_type": "network_sensitivity",
+    "question": "In a protein-protein interaction network of a cancer cell, a hub protein with 47 interaction partners is inhibited by a drug. A peripheral protein with only 2 interaction partners is also inhibited by a different drug. Explain why the peripheral protein's inhibition might produce a more severe phenotype in certain network contexts.",
+    "reference_answer": "Hub proteins with many interaction partners are often buffered by network redundancy — alternative pathways and paralogues compensate for their loss, limiting phenotypic severity. A peripheral protein with only 2 interactions can be more critical if it sits at a bottleneck between two otherwise disconnected network modules, giving it high betweenness centrality despite low degree. Removing such a bottleneck severs information flow between modules, causing cascade failures that hub inhibition would not produce. This illustrates that degree centrality is a poor predictor of functional criticality — betweenness centrality and network community structure determine which nodes are truly essential for signal transmission.",
+    "expected_reasoning_steps": [
+      "Hub proteins often have redundant pathways compensating for their loss",
+      "Peripheral proteins at network bottlenecks control information flow between modules",
+      "Betweenness centrality, not degree, determines criticality for signal transmission",
+      "Essential bridges between network communities cause cascade failures if removed"
+    ],
+    "sensitivity_trap": "Models assume hub proteins are always more critical due to high degree centrality, missing the concept of betweenness centrality and network bottlenecks.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is the distinction between degree centrality and betweenness centrality correct?",
+      "reasoning_consistency": "Does the model explain how a low-degree bottleneck causes cascade failure?",
+      "confidence_calibration": "Does the model acknowledge this depends on network topology?",
+      "domain_depth": "Are network modules or community structure mentioned?"
     }
-  ]
-}
+  },
+  {
+    "id": "PA_002",
+    "domain": "pathway_analysis",
+    "difficulty": "hard",
+    "reasoning_type": "non_linear_biological_threshold",
+    "question": "The NF-kB signalling pathway has both positive and negative feedback loops. A researcher applies a sustained, low-level inflammatory stimulus expecting a proportional, sustained NF-kB activation. Describe two scenarios where this assumption would fail and explain the underlying mechanism.",
+    "reference_answer": "First, negative feedback via IkB resynthesis — NF-kB directly transcribes IkB, its own inhibitor, creating a delayed negative feedback that produces oscillatory rather than sustained activation even under constant stimulus. The system does not reach a stable proportional state but instead cycles between active and inactive phases. Second, at certain stimulus thresholds the pathway exhibits bistability — the system switches in an all-or-nothing manner rather than responding proportionally, so a low-level stimulus either fails to trigger activation or triggers full activation with no intermediate state. Adaptation mechanisms can also cause desensitisation where initial activation is followed by refractory periods despite continued stimulus.",
+    "expected_reasoning_steps": [
+      "Negative feedback via IkB resynthesis causes oscillatory rather than sustained activation",
+      "Bistability can cause switch-like all-or-nothing responses at certain stimulus thresholds",
+      "Adaptation mechanisms cause desensitisation to sustained low-level stimuli",
+      "Crosstalk with p38 MAPK can alter the dynamics of NF-kB response"
+    ],
+    "sensitivity_trap": "Models predict linear proportional responses to stimuli, missing oscillatory dynamics, bistability, and adaptation that are hallmarks of feedback-regulated pathways.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is IkB negative feedback and its role in NF-kB oscillation correctly described?",
+      "reasoning_consistency": "Are two mechanistically distinct failure scenarios provided?",
+      "confidence_calibration": "Does the model note cell-type and stimulus-context dependency?",
+      "domain_depth": "Is bistability or oscillatory NF-kB dynamics mentioned specifically?"
+    }
+  },
+  {
+    "id": "PA_003",
+    "domain": "pathway_analysis",
+    "difficulty": "hard",
+    "reasoning_type": "context_dependent_sensitivity",
+    "question": "During SARS-CoV-2 infection, the viral protein NSP1 globally suppresses host mRNA translation. Yet certain host immune transcripts escape this suppression. Explain how this selectivity arises and why a model that treats NSP1 as a uniform translational suppressor would fail to predict immune outcomes.",
+    "reference_answer": "NSP1 blocks the ribosome entry channel, suppressing cap-dependent translation of most host mRNAs. However, certain immune transcripts escape through structural features in their 5' UTRs that allow cap-independent translation initiation, including IRES elements. Interferon-stimulated genes can also use specialised translation initiation mechanisms resistant to NSP1. Stress granule formation during infection redistributes translation machinery in ways that selectively favour certain transcripts. A uniform suppression model predicts equal reduction of all host mRNAs and therefore fails to predict which immune genes are actually expressed — missing the selective advantage the virus gains by suppressing inflammatory but not interferon-stimulated responses, and incorrectly predicting the downstream immune evasion phenotype.",
+    "expected_reasoning_steps": [
+      "NSP1 blocks ribosome entry channel — mRNAs with IRES elements or specific 5' UTR features escape",
+      "Stress granule formation redistributes translation machinery selectively",
+      "Certain ISGs have specialised translation initiation mechanisms resistant to NSP1",
+      "Uniform suppression model misses selective advantage given to immune evasion"
+    ],
+    "sensitivity_trap": "Models treat NSP1 suppression as uniform and global, missing the selective escape mechanisms that determine the actual immune response and disease outcome.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is NSP1 ribosome binding mechanism and IRES escape described correctly?",
+      "reasoning_consistency": "Does the model connect selective translation to immune evasion outcomes?",
+      "confidence_calibration": "Does the model acknowledge this is an active research area with incomplete understanding?",
+      "domain_depth": "Are ISGs or stress granule dynamics mentioned?"
+    }
+  },
+  {
+    "id": "PA_004",
+    "domain": "pathway_analysis",
+    "difficulty": "hard",
+    "reasoning_type": "metabolic_network_sensitivity",
+    "question": "A systems biology model predicts that inhibiting glycolysis in a tumour cell will eliminate ATP production and cause cell death. In practice, many cancer cells survive glycolysis inhibition. Using pathway-level reasoning, explain why the model's prediction fails.",
+    "reference_answer": "The model fails because it treats glycolysis as the sole ATP source, ignoring metabolic network redundancy. Cancer cells exhibit substantial metabolic plasticity and can switch to oxidative phosphorylation when glycolysis is inhibited. Glutamine-driven anaplerosis feeds the TCA cycle and sustains ATP production independently of glycolysis. The pentose phosphate pathway provides alternative carbon routing. The tumour microenvironment supplies alternative substrates including fatty acids and lactate that fuel mitochondrial respiration. The degree of metabolic plasticity is cancer-type dependent — some cancers are more glycolysis-dependent than others — and the tumour microenvironment further determines which alternative pathways are available, making a single-pathway inhibition model fundamentally inadequate.",
+    "expected_reasoning_steps": [
+      "Cancer cells exhibit metabolic plasticity — can switch to oxidative phosphorylation",
+      "Pentose phosphate pathway provides alternative carbon routing",
+      "Glutamine-driven anaplerosis compensates for glycolytic loss",
+      "Tumour microenvironment provides alternative substrates (fatty acids, lactate)"
+    ],
+    "sensitivity_trap": "Models treat glycolysis as the sole ATP source in cancer, missing metabolic network redundancy and plasticity that characterise actual tumour metabolism.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Are alternative metabolic pathways correctly identified?",
+      "reasoning_consistency": "Does the model explain the switch mechanism rather than just listing alternatives?",
+      "confidence_calibration": "Does the model note cancer-type and microenvironment dependency?",
+      "domain_depth": "Is glutamine anaplerosis or the Warburg effect discussed?"
+    }
+  },
+  {
+    "id": "PA_005",
+    "domain": "pathway_analysis",
+    "difficulty": "hard",
+    "reasoning_type": "network_feedback_sensitivity",
+    "question": "In a gene regulatory network, transcription factor A activates gene B, which encodes a repressor of gene C. Gene C encodes an activator of transcription factor A. A researcher knocks out gene B expecting to increase gene C expression proportionally. Explain why the actual outcome may be far more complex.",
+    "reference_answer": "Knockout of gene B relieves repression of gene C, causing an initial increase in C expression. Increased C activates transcription factor A, which in turn drives more A activity through a positive feedback loop. This positive feedback can drive the system into a new stable high-expression state through bistability — the network behaves as a toggle switch rather than a proportional responder. The final equilibrium may be dramatically different from a proportional prediction, with the system locking into either a fully active or fully inactive state depending on initial conditions and rate constants. The outcome is therefore highly sensitive to the specific kinetic parameters of the network and cannot be predicted from the wiring diagram alone without quantitative modelling.",
+    "expected_reasoning_steps": [
+      "Knockout of B relieves repression of C — initial increase in C expression",
+      "Increased C activates A, creating a positive feedback loop",
+      "Positive feedback can drive expression to a new stable state — bistability",
+      "The new equilibrium may be far from proportional — switch-like behaviour"
+    ],
+    "sensitivity_trap": "Models predict proportional linear responses in gene regulatory networks, missing that feedback loops create non-linear dynamics, bistability, and switch-like state transitions.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is the feedback loop structure correctly traced?",
+      "reasoning_consistency": "Does the model predict bistability or oscillation rather than proportional response?",
+      "confidence_calibration": "Does the model note that outcome depends on rate constants and expression thresholds?",
+      "domain_depth": "Is bistability, hysteresis, or toggle switch network motif mentioned?"
+    }
+  },
+  {
+    "id": "PA_006",
+    "domain": "pathway_analysis",
+    "difficulty": "hard",
+    "reasoning_type": "cascade_reasoning",
+    "question": "The PI3K/AKT/mTOR pathway is activated by receptor tyrosine kinases. A researcher inhibits mTORC1 with rapamycin expecting durable suppression of cell growth. Instead, tumour cells show initial growth arrest followed by re-emergence of proliferation. Explain the feedback mechanisms responsible for this rebound.",
+    "reference_answer": "mTORC1 inhibition by rapamycin initially suppresses protein synthesis and cell growth. However, mTORC1 normally phosphorylates and inhibits IRS-1 (insulin receptor substrate-1) as a negative feedback — rapamycin relieves this feedback, allowing IRS-1 to hyperactivate PI3K and AKT. Elevated AKT activity then reactivates mTORC2 targets and survival signalling, compensating for mTORC1 loss. Additionally, 4EBP1 phosphorylation by mTORC1 is rapamycin-resistant at longer timepoints, so cap-dependent translation of oncogenic mRNAs resumes. This illustrates that inhibiting a single node in a feedback-rich pathway activates compensatory loops that restore pathway output, and that durable suppression requires targeting multiple nodes simultaneously.",
+    "expected_reasoning_steps": [
+      "mTORC1 normally suppresses IRS-1 as negative feedback — rapamycin relieves this brake",
+      "Relieved IRS-1 hyperactivates PI3K-AKT, compensating for mTORC1 loss",
+      "4EBP1 phosphorylation is rapamycin-resistant at sustained timepoints",
+      "Single-node inhibition in feedback-rich pathways activates compensatory loops"
+    ],
+    "sensitivity_trap": "Models predict sustained pathway suppression from mTORC1 inhibition without accounting for relief of negative feedback and compensatory AKT activation.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is IRS-1 negative feedback and AKT reactivation correctly described?",
+      "reasoning_consistency": "Does the model trace the full rebound mechanism including feedback relief?",
+      "confidence_calibration": "Does the model note that combination therapy targeting PI3K and mTOR is needed?",
+      "domain_depth": "Is IRS-1 feedback, 4EBP1 rapamycin resistance, or mTORC2 reactivation mentioned?"
+    }
+  },
+  {
+    "id": "PA_007",
+    "domain": "pathway_analysis",
+    "difficulty": "hard",
+    "reasoning_type": "context_dependent_sensitivity",
+    "question": "TGF-β signalling acts as a tumour suppressor in early-stage cancer but switches to a tumour promoter in late-stage disease. Using pathway-level reasoning, explain how the same ligand-receptor system produces opposite biological outcomes in different cellular contexts.",
+    "reference_answer": "In normal epithelial cells and early-stage tumours, TGF-β activates SMAD2/3, which induces p21 and p15 cell cycle inhibitors and promotes apoptosis — a tumour suppressive programme. As tumours progress, they frequently acquire mutations in SMAD4, TGFBR2, or downstream cell cycle machinery that uncouple TGF-β from its growth-suppressive outputs. In late-stage cells, TGF-β signalling is rewired through non-SMAD pathways including PI3K-AKT, RAS-ERK, and Rho-GTPases, promoting epithelial-mesenchymal transition, invasion, and immunosuppression. The tumour microenvironment also contributes — TGF-β suppresses cytotoxic T cell activity and NK cells regardless of stage. The same pathway therefore produces opposite outputs because the downstream signalling network context and mutation landscape determine which effectors are engaged.",
+    "expected_reasoning_steps": [
+      "Early TGF-β signals through SMAD2/3 to induce cell cycle arrest and apoptosis",
+      "Late-stage tumours acquire SMAD4 or TGFBR2 mutations uncoupling growth suppression",
+      "Non-SMAD TGF-β pathways promote EMT, invasion, and immunosuppression",
+      "Same ligand produces opposite outputs due to different downstream network context"
+    ],
+    "sensitivity_trap": "Models assign a fixed tumour suppressor or promoter role to TGF-β without recognising that cellular mutation landscape and downstream network rewiring determine the output.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is SMAD-dependent tumour suppression and non-SMAD EMT promotion correctly described?",
+      "reasoning_consistency": "Does the model explain the mechanistic switch rather than just stating context-dependency?",
+      "confidence_calibration": "Does the model note that TGF-β output is a major unresolved challenge in cancer biology?",
+      "domain_depth": "Is SMAD4 loss, EMT, or non-SMAD signalling specifically mentioned?"
+    }
+  },
+  {
+    "id": "PA_008",
+    "domain": "pathway_analysis",
+    "difficulty": "hard",
+    "reasoning_type": "non_linear_biological_threshold",
+    "question": "The Wnt/β-catenin pathway controls cell fate decisions in intestinal stem cells. A researcher introduces a 30% reduction in APC tumour suppressor activity. Rather than a proportional increase in β-catenin signalling, the outcome is dramatically non-linear. Explain the molecular basis for this non-linearity.",
+    "reference_answer": "APC is a core component of the destruction complex that phosphorylates β-catenin for proteasomal degradation. The destruction complex functions as a catalytic machine — it processes many β-catenin molecules per unit time, so its activity is not simply proportional to APC concentration. A 30% reduction in APC may reduce destruction complex processivity below the threshold needed to clear newly synthesised β-catenin efficiently. Because β-catenin accumulation is self-reinforcing — accumulated β-catenin in the nucleus activates Wnt target genes including cyclin D1 and MYC which further destabilise the destruction complex — the system has positive feedback that amplifies small reductions in APC activity into large increases in β-catenin signalling. This ultrasensitive, threshold-dependent behaviour explains why heterozygous APC loss produces adenomas rather than a modest 30% increase in Wnt signalling.",
+    "expected_reasoning_steps": [
+      "Destruction complex functions catalytically — activity is not linearly proportional to APC levels",
+      "Partial APC loss may drop destruction complex activity below threshold for efficient β-catenin clearance",
+      "β-catenin accumulation activates Wnt target genes that further destabilise the destruction complex",
+      "Positive feedback creates ultrasensitive threshold response rather than proportional change"
+    ],
+    "sensitivity_trap": "Models predict proportional increase in β-catenin from proportional APC reduction, missing the catalytic nature of the destruction complex and the positive feedback amplification.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is APC destruction complex function and β-catenin degradation correctly described?",
+      "reasoning_consistency": "Does the model explain non-linearity through catalytic threshold and positive feedback?",
+      "confidence_calibration": "Does the model note that the threshold depends on β-catenin synthesis rate and destruction complex stoichiometry?",
+      "domain_depth": "Is destruction complex catalytic processivity, ultrasensitivity, or Wnt target gene positive feedback mentioned?"
+    }
+  },
+  {
+    "id": "PA_009",
+    "domain": "pathway_analysis",
+    "difficulty": "hard",
+    "reasoning_type": "systems_reasoning",
+    "question": "In a multi-cellular tumour spheroid, cells at the core show activation of HIF-1α, AMPK, and autophagy pathways simultaneously. A researcher targeting only HIF-1α expects to resolve the metabolic stress. Using systems-level reasoning, explain why single-pathway targeting is likely to fail.",
+    "reference_answer": "Core tumour cells simultaneously activate HIF-1α (hypoxia response), AMPK (energy stress response), and autophagy (nutrient recycling) because they experience multiple converging stresses — hypoxia, glucose deprivation, and acidosis — that are partially independent. HIF-1α inhibition addresses the hypoxic transcriptional response but does not resolve glucose deprivation or acidosis, so AMPK activation and autophagy persist independently. Moreover, AMPK and autophagy provide survival mechanisms that partially compensate for HIF-1α loss by maintaining ATP levels and recycling macromolecules. The three pathways are also interconnected — HIF-1α promotes glycolysis which feeds back to AMPK status, and autophagy is regulated by both mTORC1 (downstream of AMPK) and HIF-1α targets. Single-pathway inhibition in this network context will be buffered by the remaining active survival pathways, requiring multi-target approaches to overcome tumour core survival.",
+    "expected_reasoning_steps": [
+      "Multiple independent stresses activate parallel survival pathways simultaneously",
+      "HIF-1α inhibition does not resolve glucose deprivation or acidosis driving AMPK and autophagy",
+      "AMPK and autophagy compensate for HIF-1α loss maintaining cell survival",
+      "Interconnections between pathways mean single inhibition is buffered by network redundancy"
+    ],
+    "sensitivity_trap": "Models treat pathway activation as sequential and hierarchical, missing that multiple parallel stress responses are independently maintained and compensate for each other.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Are HIF-1α, AMPK, and autophagy pathway interactions correctly described?",
+      "reasoning_consistency": "Does the model explain why single-pathway inhibition is insufficient through network compensation?",
+      "confidence_calibration": "Does the model note that the degree of compensation is tumour-type and microenvironment dependent?",
+      "domain_depth": "Is mTORC1-autophagy axis, AMPK-HIF crosstalk, or multi-target therapy rationale mentioned?"
+    }
+  },
+  {
+    "id": "PA_010",
+    "domain": "pathway_analysis",
+    "difficulty": "hard",
+    "reasoning_type": "cascade_reasoning",
+    "question": "A researcher models apoptosis as a simple linear cascade: death signal → caspase-8 activation → caspase-3 activation → cell death. Identify three non-linear features of the actual apoptotic network that this model misses, and explain the functional consequence of each.",
+    "reference_answer": "First, the mitochondrial amplification loop — caspase-8 cleaves BID to tBID, which permeabilises mitochondria releasing cytochrome c, which assembles the apoptosome to massively amplify caspase-9 and caspase-3 activation. This creates a non-linear signal amplification that converts a small initiator signal into irreversible commitment. Second, the BCL-2 family rheostat — BCL-2, BCL-XL, and MCL-1 anti-apoptotic proteins continuously sequester pro-apoptotic BAX and BAK; the threshold for MOMP is determined by the balance of these competing interactions, not a linear cascade, creating switch-like all-or-nothing commitment to apoptosis. Third, IAP-mediated inhibition and XIAP degradation — XIAP directly inhibits caspase-3 and caspase-9, creating a threshold that must be overcome by Smac/DIABLO release from mitochondria. These features together mean apoptosis is a bistable switch not a linear cascade — cells are either committed or not, and the threshold is determined by the balance of competing survival and death signals.",
+    "expected_reasoning_steps": [
+      "Mitochondrial amplification loop creates non-linear signal amplification via tBID-MOMP",
+      "BCL-2 family rheostat creates switch-like MOMP threshold not linear progression",
+      "XIAP inhibition of caspase-3 requires Smac/DIABLO override — additional threshold",
+      "Apoptosis is bistable switch not linear cascade — all-or-nothing commitment"
+    ],
+    "sensitivity_trap": "Models describe apoptosis as a linear amplifying cascade, missing the bistable switch behaviour, BCL-2 rheostat, and mitochondrial amplification loop that create threshold-dependent irreversible commitment.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Are BCL-2 rheostat, MOMP, and XIAP inhibition correctly described?",
+      "reasoning_consistency": "Does the model identify three distinct non-linear features with functional consequences?",
+      "confidence_calibration": "Does the model note that apoptotic threshold varies by cell type and stress history?",
+      "domain_depth": "Is MOMP irreversibility, BCL-2 rheostat, Smac/DIABLO, or apoptotic bistability specifically mentioned?"
+    }
+  },
+  {
+    "id": "PA_011",
+    "domain": "pathway_analysis",
+    "difficulty": "hard",
+    "reasoning_type": "context_dependent_sensitivity",
+    "question": "Notch signalling between two adjacent cells produces opposite cell fates — one becomes a signal-sending cell, the other a signal-receiving cell. This lateral inhibition pattern emerges from seemingly identical initial conditions. Explain the pathway-level mechanism that breaks symmetry and amplifies small differences into distinct fates.",
+    "reference_answer": "Lateral inhibition through Notch-Delta signalling operates through a mutual inhibition positive feedback loop. When one cell stochastically expresses slightly more Delta ligand, it activates Notch in its neighbour, which suppresses Delta expression in that neighbour. Simultaneously, Notch activation in the neighbour suppresses its own Delta, which relieves Notch activation in the original cell, allowing it to express even more Delta. This creates a double-negative feedback that is equivalent to mutual exclusion — small stochastic differences in initial Delta expression are amplified into a bistable pattern where one cell is Delta-high/Notch-low (sender) and the adjacent cell is Delta-low/Notch-high (receiver). The symmetry breaking is inherently stochastic and depends on noise in gene expression, not a pre-patterned difference, making it impossible to predict which specific cell will adopt which fate — only the pattern statistics can be predicted.",
+    "expected_reasoning_steps": [
+      "Stochastic Delta expression difference initiates feedback",
+      "Delta in one cell activates Notch in neighbour, suppressing Delta there",
+      "Double-negative feedback amplifies small differences into discrete fate states",
+      "Symmetry breaking is stochastic — pattern statistics predictable, individual cell fate not"
+    ],
+    "sensitivity_trap": "Models treat cell fate determination as deterministic and pre-patterned, missing the stochastic symmetry breaking and mutual inhibition positive feedback that generates lateral inhibition patterns.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is Notch-Delta mutual inhibition and lateral inhibition mechanism correctly described?",
+      "reasoning_consistency": "Does the model explain symmetry breaking through stochastic amplification?",
+      "confidence_calibration": "Does the model note that individual cell fate is stochastic while pattern is deterministic?",
+      "domain_depth": "Is double-negative feedback, lateral inhibition, or stochastic gene expression noise mentioned?"
+    }
+  },
+  {
+    "id": "PA_012",
+    "domain": "pathway_analysis",
+    "difficulty": "hard",
+    "reasoning_type": "metabolic_network_sensitivity",
+    "question": "A metabolic flux analysis of a cancer cell line shows that the TCA cycle operates in a truncated, non-canonical configuration with reverse flux through certain reactions. A researcher assumes standard TCA cycle stoichiometry when modelling drug response. What are the consequences of this assumption and what does reverse TCA flux indicate biologically?",
+    "reference_answer": "Assuming standard forward TCA cycle stoichiometry in a cell using reverse flux will produce incorrect predictions of metabolite levels, redox balance, and drug sensitivity. Reverse TCA flux — specifically reductive carboxylation of glutamine-derived alpha-ketoglutarate by IDH1/2 in reverse — produces citrate from glutamine rather than consuming it, allowing lipid synthesis under hypoxic conditions where oxidative TCA is impaired. This configuration also generates NADPH for antioxidant defence rather than NADH for ATP production. A drug targeting oxidative TCA reactions may be ineffective or produce unexpected effects if cells are actually running reductive TCA. Reverse flux also indicates that the cell is under hypoxic or pseudohypoxic stress, is relying on glutamine as the primary carbon source, and has reorganised its redox metabolism — all of which affect drug sensitivity in ways that forward-TCA models cannot predict.",
+    "expected_reasoning_steps": [
+      "Reverse TCA flux via reductive carboxylation uses glutamine to produce citrate for lipid synthesis",
+      "Generates NADPH not NADH — different redox consequences than forward TCA",
+      "Standard stoichiometry model predicts wrong metabolite levels and redox balance",
+      "Reverse flux indicates hypoxia, glutamine dependence, and altered drug sensitivity"
+    ],
+    "sensitivity_trap": "Models apply standard forward TCA stoichiometry universally, missing that cancer cells frequently operate non-canonical metabolic configurations with reversed flux that fundamentally alter drug response predictions.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is reductive carboxylation, IDH reverse flux, and NADPH generation correctly described?",
+      "reasoning_consistency": "Does the model explain the consequences of wrong stoichiometry assumptions on drug response prediction?",
+      "confidence_calibration": "Does the model note that TCA configuration is context and oxygen availability dependent?",
+      "domain_depth": "Is reductive carboxylation, IDH1/2 reverse activity, or glutamine-to-citrate flux mentioned?"
+    }
+  },
+  {
+    "id": "PA_013",
+    "domain": "pathway_analysis",
+    "difficulty": "hard",
+    "reasoning_type": "systems_reasoning",
+    "question": "A researcher maps the JAK-STAT signalling pathway in isolation and concludes that STAT3 activation requires JAK2 phosphorylation of the receptor. In primary tumour samples, however, STAT3 is constitutively active in the absence of detectable JAK2 activity. Using pathway-level reasoning, identify alternative mechanisms that explain this finding.",
+    "reference_answer": "STAT3 can be activated through multiple JAK-independent mechanisms that are invisible in reconstituted pathway models. Src family kinases can directly phosphorylate STAT3 at Y705 independently of JAK2. EGFR and other receptor tyrosine kinases activate STAT3 through direct receptor-STAT3 interaction. IL-6 family cytokines signalling through gp130 can activate STAT3 via JAK1 or TYK2 rather than JAK2, which may be below detection threshold. Oncogenic mutations in STAT3 itself produce constitutive dimerisation and activation independent of upstream kinases. Non-receptor tyrosine kinases such as BCR-ABL in certain leukaemias directly phosphorylate STAT3. Acetylation of STAT3 at K685 promotes constitutive dimerisation through a phosphorylation-independent mechanism. This multiplicity of activation routes means that JAK2-centric pathway models systematically underestimate the redundancy of STAT3 activation and will fail to predict resistance to JAK2 inhibitors.",
+    "expected_reasoning_steps": [
+      "Src family kinases activate STAT3 Y705 independently of JAK2",
+      "Alternative JAK family members (JAK1, TYK2) may activate STAT3 below JAK2 detection threshold",
+      "Oncogenic STAT3 mutations produce constitutive activation independent of upstream kinases",
+      "Non-receptor tyrosine kinases and acetylation provide additional JAK-independent activation"
+    ],
+    "sensitivity_trap": "Models treat JAK2 as the obligate upstream activator of STAT3, missing the multiple parallel activation routes that explain constitutive STAT3 activity in JAK2-negative tumours.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Are Src kinase, alternative JAK, and STAT3 mutation mechanisms correctly described?",
+      "reasoning_consistency": "Does the model identify multiple mechanistically distinct JAK-independent routes?",
+      "confidence_calibration": "Does the model note that identifying the active mechanism requires phosphoproteomics not just pathway diagrams?",
+      "domain_depth": "Is Src-STAT3 axis, STAT3 acetylation, or oncogenic STAT3 mutation mentioned?"
+    }
+  },
+  {
+    "id": "PA_014",
+    "domain": "pathway_analysis",
+    "difficulty": "hard",
+    "reasoning_type": "non_linear_biological_threshold",
+    "question": "The circadian clock is a transcription-translation feedback loop. A single point mutation in the CRY1 protein extends the circadian period from 24 to 28 hours. Explain why a single amino acid change in one clock component produces such a large period change, and why period changes are non-linearly sensitive to CRY1 stability.",
+    "reference_answer": "The circadian period is determined by the time required for the negative feedback loop to complete one cycle — primarily the delay between CLOCK/BMAL1-driven transcription of PER/CRY and sufficient PER/CRY accumulation to inhibit CLOCK/BMAL1. CRY1 stability directly determines the duration of the repressive phase. A mutation that slows CRY1 degradation extends the repressive phase, delaying the next activation cycle and lengthening the period. The non-linear sensitivity arises because period length is determined by the integral of CRY1 concentration over time — small changes in degradation rate produce large changes in the duration above the inhibitory threshold, especially near the degradation rate that creates the normal 24-hour period. The system is operating near a Hopf bifurcation point where small parameter changes produce large changes in oscillation dynamics, making period length highly sensitive to CRY1 stability changes that would appear minor in isolation.",
+    "expected_reasoning_steps": [
+      "Period determined by time for PER/CRY to accumulate and inhibit CLOCK/BMAL1",
+      "CRY1 stability determines duration of repressive phase — directly sets period length",
+      "Period is integral of CRY1 concentration over time — non-linearly sensitive to degradation rate",
+      "System operates near Hopf bifurcation — small parameter changes produce large period changes"
+    ],
+    "sensitivity_trap": "Models predict proportional period change from proportional CRY1 stability change, missing that oscillation period is non-linearly sensitive to component stability near the normal operating point.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is CLOCK/BMAL1-PER/CRY feedback loop and period determination correctly described?",
+      "reasoning_consistency": "Does the model explain the non-linear sensitivity through integral dynamics or bifurcation?",
+      "confidence_calibration": "Does the model note that period sensitivity depends on which phase of the cycle CRY1 acts in?",
+      "domain_depth": "Is Hopf bifurcation, repressive phase duration, or CRY1 degradation kinetics mentioned?"
+    }
+  },
+  {
+    "id": "PA_015",
+    "domain": "pathway_analysis",
+    "difficulty": "hard",
+    "reasoning_type": "cascade_reasoning",
+    "question": "In T cell activation, the TCR signalling cascade involves ZAP-70, LAT, PLCγ1, and ultimately NFATc1 nuclear translocation. A researcher inhibits PLCγ1 and expects proportional reduction in NFATc1 activity. Explain why this is likely to be an underestimate of PLCγ1's impact and trace the full cascade consequences.",
+    "reference_answer": "PLCγ1 inhibition has broader consequences than proportional NFATc1 reduction because PLCγ1 cleaves PIP2 into two second messengers — IP3 and DAG — that activate parallel downstream branches. IP3 triggers calcium release from the ER, activating calcineurin which dephosphorylates and activates all NFAT family members. DAG activates PKCθ which activates NF-κB and AP-1 independently of NFAT. PLCγ1 inhibition therefore simultaneously suppresses calcium-NFAT, PKCθ-NF-κB, and PKCθ-AP-1 signalling — three transcriptional programmes rather than one. Furthermore, calcium signalling amplifies the TCR response through calmodulin-dependent kinases that phosphorylate additional transcription factors. The coincidence detection requirement — simultaneous NFAT, NF-κB, and AP-1 activation — for IL-2 transcription means that partial inhibition of any single branch can produce a disproportionately large suppression of the integrated transcriptional output because all three must be active simultaneously.",
+    "expected_reasoning_steps": [
+      "PLCγ1 generates IP3 and DAG — two parallel second messenger branches",
+      "IP3-calcium-calcineurin activates all NFAT family members not just NFATc1",
+      "DAG-PKCθ activates NF-κB and AP-1 independently",
+      "Coincidence detection for IL-2 means partial inhibition produces disproportionate output suppression"
+    ],
+    "sensitivity_trap": "Models trace PLCγ1 inhibition only through the IP3-calcium-NFATc1 branch, missing the parallel DAG-PKCθ branch and the coincidence detection requirement that amplifies the transcriptional consequence.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is PLCγ1 dual second messenger generation and downstream branching correctly described?",
+      "reasoning_consistency": "Does the model trace both IP3 and DAG branches and their independent transcriptional targets?",
+      "confidence_calibration": "Does the model note that T cell activation threshold varies by antigen dose and co-stimulatory context?",
+      "domain_depth": "Is coincidence detection, PKCθ-NF-κB axis, or calcineurin-NFAT dephosphorylation mentioned?"
+    }
+  },
+  {
+    "id": "PA_016",
+    "domain": "pathway_analysis",
+    "difficulty": "hard",
+    "reasoning_type": "systems_reasoning",
+    "question": "A Boolean network model of a cancer signalling network has 12 nodes and is used to predict stable attractor states representing cell phenotypes. The model identifies 3 attractors. A researcher concludes these represent the only three phenotypes the cancer cell can adopt. What are the fundamental limitations of Boolean network modelling that challenge this conclusion?",
+    "reference_answer": "Boolean network models impose several simplifications that limit attractor state predictions. First, Boolean logic requires all interactions to be discretised as on/off, eliminating the graded, dose-dependent responses that generate intermediate phenotypes in real biological networks — real cells can adopt continuous phenotypic states not capturable by binary nodes. Second, the number of attractors and their basins of attraction are highly sensitive to the specific Boolean update rules chosen — synchronous versus asynchronous updating produces different attractor landscapes from identical network topology. Third, Boolean models cannot capture the temporal dynamics and oscillatory states that arise from continuous kinetics — some real phenotypes are dynamic rather than stable. Fourth, the model is limited to 12 nodes, omitting the thousands of additional genes and interactions that shape the actual attractor landscape. Fifth, Boolean models cannot represent noise-driven transitions between attractors that occur in real cells through stochastic gene expression.",
+    "expected_reasoning_steps": [
+      "Boolean discretisation eliminates graded responses and intermediate phenotypic states",
+      "Attractor landscape is sensitive to update rule choice — synchronous vs asynchronous",
+      "12-node model omits most of the actual signalling network",
+      "Cannot capture noise-driven attractor transitions or oscillatory phenotypes"
+    ],
+    "sensitivity_trap": "Models treat Boolean attractor states as exhaustive representations of biological phenotypes, missing the fundamental limitations of binary discretisation, network incompleteness, and stochastic dynamics.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Are Boolean network limitations including discretisation and update rule sensitivity correctly described?",
+      "reasoning_consistency": "Does the model identify multiple distinct limitations rather than one general criticism?",
+      "confidence_calibration": "Does the model note that Boolean models are useful approximations despite limitations?",
+      "domain_depth": "Is asynchronous updating, attractor basin sensitivity, or noise-driven transitions mentioned?"
+    }
+  },
+  {
+    "id": "PA_017",
+    "domain": "pathway_analysis",
+    "difficulty": "hard",
+    "reasoning_type": "context_dependent_sensitivity",
+    "question": "Reactive oxygen species (ROS) at low levels promote cell survival and proliferation through redox signalling. At high levels, the same ROS species cause oxidative damage and apoptosis. Explain the pathway-level mechanisms that create this dose-dependent switch, and why therapeutic strategies targeting ROS must account for this non-linearity.",
+    "reference_answer": "Low-level ROS act as second messengers by reversibly oxidising cysteine residues on signalling proteins including PTEN, PTP1B, and KEAP1. PTEN oxidation enhances PI3K-AKT survival signalling; PTP1B inhibition amplifies receptor tyrosine kinase activation; KEAP1 oxidation releases NRF2 to activate antioxidant gene expression. These are signalling events that promote proliferation and stress adaptation. At high ROS levels, the same oxidation events become irreversible, permanently inactivating tumour suppressors and creating DNA damage through 8-oxoguanine and strand breaks. The switch between signalling and damage is determined by the ratio of ROS to antioxidant capacity — glutathione, thioredoxin, and NADPH. This creates a non-linear threshold where ROS below the antioxidant buffering capacity have signalling effects, while ROS above it overwhelm buffers and cause damage. Therapeutic strategies that increase ROS to kill tumours must push cells above this threshold, but if antioxidant capacity is high the same treatment may paradoxically enhance survival signalling.",
+    "expected_reasoning_steps": [
+      "Low ROS reversibly oxidise PTEN, PTP1B, KEAP1 — activating survival and antioxidant signalling",
+      "High ROS cause irreversible oxidation, DNA damage, and apoptosis",
+      "Threshold determined by ROS-to-antioxidant capacity ratio — glutathione and NADPH buffering",
+      "Pro-oxidant therapy must exceed antioxidant threshold — may paradoxically enhance survival below threshold"
+    ],
+    "sensitivity_trap": "Models treat ROS as uniformly damaging or uniformly signalling, missing the dose-dependent switch between redox signalling and oxidative damage that is determined by antioxidant buffering capacity.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Is PTEN/PTP1B oxidation, KEAP1-NRF2, and antioxidant buffering correctly described?",
+      "reasoning_consistency": "Does the model explain the threshold mechanism and therapeutic implications?",
+      "confidence_calibration": "Does the model note that the ROS threshold varies dramatically between cell types and metabolic states?",
+      "domain_depth": "Is KEAP1-NRF2 axis, glutathione buffering, reversible vs irreversible oxidation, or redox signalling mentioned?"
+    }
+  },
+  {
+    "id": "PA_018",
+    "domain": "pathway_analysis",
+    "difficulty": "hard",
+    "reasoning_type": "cascade_reasoning",
+    "question": "In the DNA damage response, ATM kinase is activated by double-strand breaks and phosphorylates hundreds of substrates. A researcher focuses only on the p53-p21 axis as the output of ATM activation. What critical ATM-dependent cascade branches does this miss, and why does single-branch thinking lead to incorrect predictions about cell fate after DNA damage?",
+    "reference_answer": "ATM activates multiple parallel effector branches simultaneously. The CHK2 branch phosphorylates CDC25 phosphatases, triggering their degradation and directly inhibiting CDK1 and CDK2 to enforce G2/M and S-phase checkpoints independently of p53. The BRCA1 and BRCA2 phosphorylation branch coordinates DNA repair through homologous recombination, determining whether damage is repaired or becomes permanent. The NF-κB activation branch through NEMO phosphorylation promotes inflammatory cytokine production and pro-survival signalling in a p53-independent manner. H2AX phosphorylation (γH2AX) recruits repair factors including MDC1, 53BP1, and RIF1 that determine repair pathway choice between HR and NHEJ. The MRN complex is maintained at DSBs by ATM phosphorylation, sustaining ATM activation in a positive feedback loop. Focusing only on p53-p21 misses the direct cell cycle checkpoint enforcement, DNA repair pathway choice, and inflammatory outputs that together determine whether the cell undergoes arrest, repair, senescence, or apoptosis.",
+    "expected_reasoning_steps": [
+      "CHK2-CDC25 branch enforces cell cycle checkpoints independently of p53",
+      "BRCA1/2 phosphorylation determines DNA repair pathway choice HR vs NHEJ",
+      "NF-κB activation through NEMO promotes survival and inflammation p53-independently",
+      "Single-branch thinking misses repair vs apoptosis fate determination"
+    ],
+    "sensitivity_trap": "Models reduce ATM signalling to the p53-p21 axis, missing the parallel CHK2, BRCA1, NF-κB, and γH2AX branches that independently determine cell cycle arrest, repair, and survival outcomes.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Are CHK2-CDC25, BRCA1/2, NF-κB-NEMO, and γH2AX branches correctly described?",
+      "reasoning_consistency": "Does the model explain how missed branches alter cell fate predictions?",
+      "confidence_calibration": "Does the model note that branch dominance depends on damage extent and cell type?",
+      "domain_depth": "Is CHK2-CDC25 axis, NEMO phosphorylation, γH2AX-53BP1, or HR vs NHEJ choice mentioned?"
+    }
+  },
+  {
+    "id": "PA_019",
+    "domain": "pathway_analysis",
+    "difficulty": "hard",
+    "reasoning_type": "network_feedback_sensitivity",
+    "question": "A kinase inhibitor achieves 95% target inhibition in a biochemical assay. In a cellular context, the same inhibitor produces only 30% reduction in the pathway output it was designed to suppress. Using systems-level pathway reasoning, explain the mechanisms that account for this discrepancy.",
+    "reference_answer": "Multiple pathway-level mechanisms buffer against near-complete target inhibition. First, signal amplification in the kinase cascade means that 5% residual kinase activity, amplified through downstream phosphorylation cascades, is sufficient to maintain substantial pathway output. Second, parallel input pathways converging on the same downstream effector compensate when one upstream kinase is inhibited — for example, RAS can activate ERK through RAF-independent mechanisms including PI3K-PDK1. Third, feedback relief — the inhibited kinase may normally suppress activating signals upstream through negative feedback, so its inhibition paradoxically increases upstream activator levels that partially restore downstream signalling. Fourth, scaffold proteins can facilitate kinase-substrate interactions that are inhibitor-resistant due to conformational effects. Fifth, cellular pharmacokinetics may reduce intracellular drug concentration below the biochemical IC50 through efflux pumps or drug sequestration. This illustrates that biochemical potency does not translate linearly to cellular pathway suppression.",
+    "expected_reasoning_steps": [
+      "Signal amplification means 5% residual activity maintains substantial downstream output",
+      "Parallel convergent pathways compensate for single kinase inhibition",
+      "Negative feedback relief increases upstream activators, partially restoring output",
+      "Cellular pharmacokinetics reduce effective intracellular concentration below biochemical IC50"
+    ],
+    "sensitivity_trap": "Models assume biochemical inhibition percentage translates proportionally to pathway output reduction, missing signal amplification, pathway convergence, feedback relief, and cellular pharmacokinetics.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Are signal amplification, pathway convergence, and feedback relief correctly described?",
+      "reasoning_consistency": "Does the model identify multiple mechanistically distinct discrepancy sources?",
+      "confidence_calibration": "Does the model note that the biochemical-to-cellular gap varies by pathway architecture?",
+      "domain_depth": "Is signal amplification, feedback relief, scaffold effects, or drug efflux mentioned?"
+    }
+  },
+  {
+    "id": "PA_020",
+    "domain": "pathway_analysis",
+    "difficulty": "hard",
+    "reasoning_type": "systems_reasoning",
+    "question": "A researcher constructs a static pathway map of the EGFR signalling network containing 150 nodes and 300 edges. They use this map to predict which nodes are essential for tumour cell survival. Explain three fundamental reasons why static pathway maps are insufficient for predicting dynamic biological behaviour and therapeutic response.",
+    "reference_answer": "First, static maps do not capture temporal dynamics — the same network can produce different outputs depending on the timing, duration, and amplitude of input signals. EGFR activation produces different transcriptional programmes depending on whether the stimulus is transient (proliferation) or sustained (differentiation), a distinction invisible in a static map. Second, static maps cannot represent context-dependent edge weights — the strength and even direction of interactions change with cell type, mutation status, and microenvironment. An interaction present in one cell type may be absent or reversed in another. Third, static maps treat all depicted interactions as simultaneously active, whereas actual signalling is temporally ordered and spatially compartmentalised — many interactions only occur in specific subcellular locations or at specific cell cycle phases. Consequently, node essentiality predictions from static maps will be systematically wrong for nodes whose importance is context-dependent, dynamic, or spatial, and therapeutic response predictions will miss feedback-driven resistance mechanisms that only emerge during sustained drug treatment.",
+    "expected_reasoning_steps": [
+      "Static maps miss temporal dynamics — same network produces different outputs by signal duration",
+      "Context-dependent edge weights change with cell type and mutation status",
+      "Spatial compartmentalisation means many interactions only occur in specific locations",
+      "Feedback-driven resistance mechanisms emerge dynamically and are invisible in static maps"
+    ],
+    "sensitivity_trap": "Models treat static pathway maps as sufficient representations of biological network behaviour, missing temporal dynamics, context-dependent edge weights, spatial compartmentalisation, and emergent resistance mechanisms.",
+    "scoring_dimensions": {
+      "factual_accuracy": "Are temporal dynamics, context-dependent edges, and spatial compartmentalisation correctly described?",
+      "reasoning_consistency": "Does the model identify three distinct limitations with mechanistic explanations?",
+      "confidence_calibration": "Does the model note that dynamic ODE or agent-based models are needed for quantitative predictions?",
+      "domain_depth": "Is temporal signal encoding, spatial compartmentalisation, or ODE modelling mentioned?"
+    }
+  }
+]
